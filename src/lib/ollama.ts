@@ -1,4 +1,4 @@
-const OLLAMA_BASE_URL = import.meta.env.VITE_OLLAMA_URL ?? 'http://localhost:11434';
+const OLLAMA_BASE_URL = window.location.origin;
 
 export interface OllamaModel {
   name: string;
