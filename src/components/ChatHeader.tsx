@@ -1,9 +1,11 @@
-import { useChatStore } from '../store/chatStore';
 import { ModelSelector } from './ModelSelector';
 
-export function ChatHeader() {
-  const { clearMessages, messages } = useChatStore();
+interface ChatHeaderProps {
+  hasMessages: boolean;
+  onClear: () => void;
+}
 
+export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
   return (
     <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white shadow-sm">
       <div className="flex items-center gap-3">
@@ -19,9 +21,9 @@ export function ChatHeader() {
       </div>
       <div className="flex items-center gap-3">
         <ModelSelector />
-        {messages.length > 0 && (
+        {hasMessages && (
           <button
-            onClick={clearMessages}
+            onClick={onClear}
             className="text-xs text-gray-500 hover:text-red-500 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100"
           >
             Clear

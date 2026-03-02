@@ -1,13 +1,18 @@
 import { useState, type KeyboardEvent } from 'react';
-import { useChatStore } from '../store/chatStore';
 
-export function ChatInput() {
+interface ChatInputProps {
+  model: string;
+  isLoading: boolean;
+  onSend: (content: string) => void;
+  onStop: () => void;
+}
+
+export function ChatInput({ model, isLoading, onSend, onStop }: ChatInputProps) {
   const [input, setInput] = useState('');
-  const { sendMessage, stopStreaming, isStreaming, model } = useChatStore();
 
   const handleSend = () => {
     if (!input.trim() || !model) return;
-    sendMessage(input);
+    onSend(input);
     setInput('');
   };
 
@@ -30,9 +35,9 @@ export function ChatInput() {
           rows={1}
           disabled={!model}
         />
-        {isStreaming ? (
+        {isLoading ? (
           <button
-            onClick={stopStreaming}
+            onClick={onStop}
             className="flex-shrink-0 w-10 h-10 rounded-xl bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors"
             aria-label="Stop"
           >

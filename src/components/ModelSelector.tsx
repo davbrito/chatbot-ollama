@@ -1,7 +1,7 @@
-import { useChatStore } from '../store/chatStore';
+import { useModelStore } from '../store/chatStore';
 
 export function ModelSelector() {
-  const { model, models, setModel } = useChatStore();
+  const { model, models, setModel } = useModelStore();
 
   if (models.length === 0) return null;
 

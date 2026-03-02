@@ -10,6 +10,13 @@ export default defineConfig((env) => {
     define: {
       "import.meta.env.GITHUB_TOKEN": JSON.stringify(process.env.GITHUB_TOKEN),
     },
+    resolve: {
+      alias: {
+        // Force the browser-compatible build of the ollama package so that
+        // Node.js built-ins (node:fs, node:path) are not bundled.
+        ollama: "ollama/browser",
+      },
+    },
     server: {
       proxy: {
         "/api": OLLAMA_URL

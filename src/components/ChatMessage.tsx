@@ -1,11 +1,19 @@
-import type { Message } from '../store/chatStore';
+import type { UIMessage } from '@tanstack/ai-react';
 
 interface ChatMessageProps {
-  message: Message;
+  message: UIMessage;
+  isLastLoading?: boolean;
 }
 
-export function ChatMessage({ message }: ChatMessageProps) {
+export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
   const isUser = message.role === 'user';
+
+  const textContent = message.parts
+    .filter((p) => p.type === 'text')
+    .map((p) => p.content)
+    .join('');
+
+  const showTypingIndicator = isLastLoading && !isUser && textContent === '';
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
@@ -21,14 +29,14 @@ export function ChatMessage({ message }: ChatMessageProps) {
             : 'bg-white text-gray-800 rounded-tl-sm border border-gray-100'
         }`}
       >
-        {message.loading ? (
+        {showTypingIndicator ? (
           <div className="flex gap-1 items-center h-5">
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0ms]" />
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:150ms]" />
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:300ms]" />
           </div>
         ) : (
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">{textContent}</p>
         )}
       </div>
       {isUser && (
