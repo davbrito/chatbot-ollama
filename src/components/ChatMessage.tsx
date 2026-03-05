@@ -60,7 +60,7 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
             )}
           </div>
         )}
-        {showTypingIndicator && !isThinking ? (
+        {showTypingIndicator ? (
           <div className="flex gap-1 items-center h-5">
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0ms]" />
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:150ms]" />
@@ -85,9 +85,6 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
           >
             {textContent}
           </Markdown>
-          // <p className="text-sm leading-relaxed whitespace-pre-wrap">
-          //   {textContent}
-          // </p>
         )}
       </div>
       {isUser && (

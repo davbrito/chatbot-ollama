@@ -1,7 +1,14 @@
 import { produce, type WritableDraft } from "immer";
+import type { ToolCall } from "ollama/browser";
 import { useRef, useState } from "react";
 import { useChatStore, type CustomMessage } from "../store/chatStore";
 import { ollama, SYSTEM_PROMPTS } from "./ollama";
+import { executeGetMovie, executeSearchMovies, tools } from "./tools";
+
+const toolExecutors: Record<string, (args: unknown) => Promise<string>> = {
+  omdb_search: executeSearchMovies,
+  omdb_get: executeGetMovie,
+};
 
 export function useChat({
   model,
@@ -83,27 +90,100 @@ export function useChat({
 
     try {
       // System prompt from lib/ollama.ts
-      const finalMessages = [...SYSTEM_PROMPTS, ...getMessages().slice(0, -1)];
+      const currentMessages = [
+        ...SYSTEM_PROMPTS,
+        ...getMessages().slice(0, -1),
+      ];
 
-      const stream = await ollama.chat({
-        model,
-        messages: finalMessages,
-        stream: true,
-      });
+      const handleToolCalls = async (calls: ToolCall[]) => {
+        let handledAny = false;
 
-      for await (const part of stream) {
+        for (const tool of calls) {
+          const executeTool = toolExecutors[tool.function.name];
+          if (!executeTool) continue;
+
+          handledAny = true;
+
+          const result = await executeTool(tool.function.arguments);
+
+          currentMessages.push({
+            role: "tool",
+            tool_name: tool.function.name,
+            content: result,
+          });
+
+          const toolMessageInit: CustomMessage = {
+            id: crypto.randomUUID(),
+            role: "tool",
+            tool_name: tool.function.name,
+            content: result,
+          };
+
+          setMessages((mssgs) => {
+            mssgs.push(toolMessageInit);
+          });
+        }
+
+        return handledAny;
+      };
+
+      let isToolCall = true;
+
+      while (isToolCall) {
+        isToolCall = false;
+
+        const stream = await ollama.chat({
+          model,
+          messages: currentMessages,
+          stream: true,
+          tools,
+        });
+
+        const toolCalls: ToolCall[] = [];
+        let assistantContent = "";
+        let assistantThinking = "";
+
+        for await (const part of stream) {
+          if (abortControllerRef.current?.signal.aborted) {
+            break;
+          }
+
+          assistantContent += part.message.content ?? "";
+          assistantThinking += part.message.thinking ?? "";
+
+          if (part.message.tool_calls) {
+            toolCalls.push(...part.message.tool_calls);
+          }
+
+          setMessages((draft) => {
+            const assistantMessage = draft.find(
+              (msg) => msg.id === assistantMessageInit.id,
+            );
+            if (assistantMessage) {
+              assistantMessage.content += part.message.content;
+              assistantMessage.thinking ??= "";
+              assistantMessage.thinking += part.message.thinking ?? "";
+              if (toolCalls.length > 0) {
+                assistantMessage.tool_calls = toolCalls;
+              }
+            }
+          });
+        }
+
         if (abortControllerRef.current?.signal.aborted) {
           break;
         }
 
-        setMessages((draft) => {
-          const last = draft[draft.length - 1];
-          if (last.id === assistantMessageInit.id) {
-            last.content += part.message.content;
-            last.thinking ??= "";
-            last.thinking += part.message.thinking ?? "";
-          }
-        });
+        if (toolCalls.length > 0) {
+          currentMessages.push({
+            role: "assistant",
+            content: assistantContent,
+            thinking: assistantThinking || undefined,
+            tool_calls: toolCalls,
+          });
+
+          isToolCall = await handleToolCalls(toolCalls);
+        }
       }
 
       // Save updated messages back to store when done
