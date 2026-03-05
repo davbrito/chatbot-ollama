@@ -36,22 +36,22 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}>
       {!isUser && (
-        <div className="shrink-0 w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center mr-3 mt-1">
-          <span className="text-white text-xs font-bold">AI</span>
+        <div className="mt-1 mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-600">
+          <span className="text-xs font-bold text-white">AI</span>
         </div>
       )}
       <div
         className={`max-w-full rounded-2xl px-4 py-3 shadow-sm ${
           isUser
-            ? "bg-indigo-600 text-white rounded-tr-sm"
-            : "bg-white text-gray-800 rounded-tl-sm border border-gray-100"
+            ? "rounded-tr-sm bg-indigo-600 text-white"
+            : "rounded-tl-sm border border-gray-100 bg-white text-gray-800"
         }`}
       >
         {!isUser && textThinking && (
           <div className="mb-2">
             <button
               onClick={() => setThinkingOpen((v) => !v)}
-              className="flex items-center gap-1 text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors"
+              className="flex items-center gap-1 text-xs font-medium text-indigo-500 transition-colors hover:text-indigo-700"
             >
               <span
                 className={`inline-block transition-transform duration-200 ${thinkingOpen ? "rotate-90" : ""}`}
@@ -68,17 +68,17 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
               )}
             </button>
             {thinkingOpen && (
-              <div className="mt-2 text-xs text-gray-500 italic bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
+              <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap text-gray-500 italic">
                 {textThinking}
               </div>
             )}
           </div>
         )}
         {showTypingIndicator ? (
-          <div className="flex gap-1 items-center h-5">
-            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0ms]" />
-            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:150ms]" />
-            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:300ms]" />
+          <div className="flex h-5 items-center gap-1">
+            <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:0ms]" />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:150ms]" />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:300ms]" />
           </div>
         ) : isUser ? (
           textContent
@@ -90,10 +90,10 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
               components={{
                 table({ node, ...props }) {
                   return (
-                    <div className="overflow-x-auto my-2 overflow-hidden border border-gray-200 rounded-xl">
+                    <div className="my-2 overflow-hidden overflow-x-auto rounded-xl border border-gray-200">
                       <table
                         {...props}
-                        className="w-full m-0! border-collapse divide-y divide-gray-200 [&>tbody]:divide-y [&>tbody]:divide-gray-100 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold [&_th]:bg-gray-50 [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm"
+                        className="m-0! w-full border-collapse divide-y divide-gray-200 [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm [&_th]:bg-gray-50 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold [&>tbody]:divide-y [&>tbody]:divide-gray-100"
                       />
                     </div>
                   );
@@ -107,7 +107,7 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
         {timeString && (
           <div
             className={`mt-1 text-[11px] ${
-              isUser ? "text-indigo-100 text-right" : "text-gray-400 text-left"
+              isUser ? "text-right text-indigo-100" : "text-left text-gray-400"
             }`}
           >
             {timeString}
@@ -115,8 +115,8 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
         )}
       </div>
       {isUser && (
-        <div className="shrink-0 w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center ml-3 mt-1">
-          <span className="text-gray-700 text-xs font-bold">Tú</span>
+        <div className="mt-1 ml-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-300">
+          <span className="text-xs font-bold text-gray-700">Tú</span>
         </div>
       )}
     </div>
