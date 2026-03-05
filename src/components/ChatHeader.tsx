@@ -1,5 +1,6 @@
 import { MessageCircleMoreIcon } from "lucide-react";
 import { ModelSelector } from "./ModelSelector";
+import { TTSProviderSelector } from "./TTSProviderSelector";
 
 interface ChatHeaderProps {
   hasMessages: boolean;
@@ -22,6 +23,7 @@ export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
       </div>
       <div className="flex items-center gap-3">
         <ModelSelector />
+        <TTSProviderSelector />
         {hasMessages && (
           <button
             onClick={onClear}

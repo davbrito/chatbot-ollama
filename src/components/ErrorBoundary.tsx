@@ -39,7 +39,7 @@ export default function ErrorBoundaryWrapper({
       FallbackComponent={ErrorFallback}
       onError={(error, info) => {
         // Log to console for now — replace with telemetry if desired
-        // eslint-disable-next-line no-console
+         
         console.error("Uncaught error:", error, info);
       }}
     >

@@ -1,12 +1,18 @@
 import "katex/dist/katex.min.css";
 
-import { ChevronRightIcon, LoaderCircleIcon } from "lucide-react";
+import { ChevronRightIcon, LoaderCircleIcon, Volume2Icon } from "lucide-react";
 import { useState } from "react";
 import Markdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
+import {
+  sanitizeForSpeech,
+  speak,
+  isSpeaking as ttsIsSpeaking,
+  stop as ttsStop,
+} from "../lib/tts";
 import type { CustomMessage } from "../store/chatStore";
 
 interface ChatMessageProps {
@@ -32,6 +38,28 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
         minute: "2-digit",
       })
     : null;
+
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  async function toggleSpeak() {
+    if (ttsIsSpeaking()) {
+      ttsStop();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const text = sanitizeForSpeech(message.content || "");
+    if (!text) return;
+
+    try {
+      setIsSpeaking(true);
+      await speak(text);
+    } catch (e) {
+      console.error("TTS error:", e);
+    } finally {
+      setIsSpeaking(false);
+    }
+  }
 
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}>
@@ -105,12 +133,30 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
           </div>
         )}
         {timeString && (
-          <div
-            className={`mt-1 text-[11px] ${
-              isUser ? "text-right text-indigo-100" : "text-left text-gray-400"
-            }`}
-          >
-            {timeString}
+          <div className="mt-1 flex items-center gap-2">
+            <div
+              className={`text-[11px] ${
+                isUser
+                  ? "text-right text-indigo-100"
+                  : "text-left text-gray-400"
+              }`}
+            >
+              {timeString}
+            </div>
+            <button
+              onClick={toggleSpeak}
+              aria-label={isSpeaking ? "Detener lectura" : "Leer en voz alta"}
+              className={`flex h-7 w-7 items-center justify-center rounded text-sm transition-colors select-none focus:outline-none ${
+                isUser
+                  ? "bg-indigo-500/20 text-indigo-100 hover:bg-indigo-500/30"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              <Volume2Icon
+                size={14}
+                className={isSpeaking ? "animate-pulse" : ""}
+              />
+            </button>
           </div>
         )}
       </div>
