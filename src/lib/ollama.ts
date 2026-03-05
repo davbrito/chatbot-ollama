@@ -1,23 +1,32 @@
-import { Ollama as OllamaClient } from 'ollama';
-import type { ModelResponse } from 'ollama';
-import { createOllamaChat } from '@tanstack/ai-ollama';
-import { stream } from '@tanstack/ai-react';
-import { convertMessagesToModelMessages } from '@tanstack/ai';
+import { Ollama as OllamaClient } from "ollama";
+import type { ModelResponse } from "ollama";
+import { createOllamaChat } from "@tanstack/ai-ollama";
+import { stream } from "@tanstack/ai-react";
+import { convertMessagesToModelMessages } from "@tanstack/ai";
 
 export type { ModelResponse };
 
-const OLLAMA_HOST = import.meta.env.VITE_OLLAMA_URL ?? 'http://localhost:11434';
+const SYSTEM_PROMPT = `Preferir idioma español, pero responde en el idioma del mensaje del usuario.`;
+
+export const ollama = new OllamaClient({
+  host: window.location.origin,
+  headers: { "X-Github-Token": import.meta.env.GITHUB_TOKEN },
+});
 
 export async function listModels(): Promise<ModelResponse[]> {
-  const client = new OllamaClient({ host: OLLAMA_HOST });
-  const { models } = await client.list();
+  const { models } = await ollama.list();
   return models;
 }
 
 export function createOllamaConnection(model: string) {
-  const adapter = createOllamaChat(model, OLLAMA_HOST);
+  const adapter = createOllamaChat(model, ollama as any);
+
   return stream((messages) => {
     const modelMessages = convertMessagesToModelMessages(messages);
-    return adapter.chatStream({ model, messages: modelMessages });
+    return adapter.chatStream({
+      model,
+      messages: modelMessages,
+      systemPrompts: [SYSTEM_PROMPT],
+    });
   });
 }

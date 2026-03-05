@@ -19,7 +19,7 @@ export default defineConfig((env) => {
     },
     server: {
       proxy: {
-        "/api": OLLAMA_URL
+        "/api": OLLAMA_URL,
       },
     },
   };
