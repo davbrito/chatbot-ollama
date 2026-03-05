@@ -27,22 +27,22 @@ export default function App() {
   }, [models, ensureActiveSession]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="isolate flex h-full flex-col bg-gray-50">
       {modelsError && (
-        <div className="p-3 bg-red-50 border-b border-red-200 text-red-700 text-sm text-center">
+        <div className="border-b border-red-200 bg-red-50 p-3 text-center text-sm text-red-700">
           <strong>Error:</strong> {modelsError}
         </div>
       )}
 
       {models.length === 0 && !modelsError ? (
-        <div className="flex flex-col items-center justify-center flex-1 text-gray-400">
+        <div className="flex flex-1 flex-col items-center justify-center text-gray-400">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-12 h-12 mb-3 animate-spin"
+            className="mb-3 h-12 w-12 animate-spin"
           >
             <path
               strokeLinecap="round"
@@ -53,14 +53,12 @@ export default function App() {
           <p className="text-sm">Conectando con Ollama...</p>
         </div>
       ) : activeModel ? (
-        <div className="flex flex-1 min-h-0">
+        <div className="flex min-h-0 flex-1">
           <ChatSidebar />
-          <div className="flex-1 min-w-0 flex flex-col">
-            <ChatContainer
-              key={`${activeModel}-${activeSessionId ?? "default"}`}
-              model={activeModel}
-            />
-          </div>
+          <ChatContainer
+            key={`${activeModel}-${activeSessionId ?? "default"}`}
+            model={activeModel}
+          />
         </div>
       ) : null}
     </div>

@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-html {
-  overflow: hidden;
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100vh;
+    overflow: hidden;
+  }
 }

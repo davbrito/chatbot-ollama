@@ -38,23 +38,26 @@ export function ChatContainer({ model }: { model: string }) {
   };
 
   return (
-    <>
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <ChatHeader hasMessages={messages.length > 0} onClear={handleClear} />
 
-      <main className="flex-1 overflow-y-auto px-4 py-6" ref={conainerRef}>
-        <div className="max-w-4xl mx-auto">
+      <main
+        className="min-h-0 flex-1 overflow-auto px-4 py-6"
+        ref={conainerRef}
+      >
+        <div className="mx-auto max-w-4xl">
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
               <strong>Error:</strong>{" "}
               {error instanceof Error ? error.message : String(error)}
             </div>
           )}
 
           {renderMessages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-64 text-gray-400">
-              <BotMessageSquareIcon className="w-12 h-12 mb-3" />
+            <div className="flex h-64 flex-col items-center justify-center text-gray-400">
+              <BotMessageSquareIcon className="mb-3 h-12 w-12" />
               <p className="text-sm font-medium">Inicia una conversación</p>
-              <p className="text-xs mt-1">
+              <p className="mt-1 text-xs">
                 Escribe un mensaje abajo para chatear con {model}
               </p>
             </div>
@@ -83,6 +86,6 @@ export function ChatContainer({ model }: { model: string }) {
         }}
         onStop={stop}
       />
-    </>
+    </div>
   );
 }
