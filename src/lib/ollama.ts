@@ -1,9 +1,10 @@
 import type { Message, ModelResponse } from "ollama/browser";
 import { Ollama as OllamaClient } from "ollama/browser";
+import systemPromptText from "../assets/SYSTEM_PROMPT.md?raw";
 import { tools } from "./tools";
 
 export const SYSTEM_PROMPTS: Message[] = [
-  { role: "system", content: "Eres un asistente experto en películas." },
+  { role: "system", content: systemPromptText },
 ];
 
 export const ollama = new OllamaClient({

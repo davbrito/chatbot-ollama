@@ -30,7 +30,7 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
         </div>
       )}
       <div
-        className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-sm ${
+        className={`max-w-full rounded-2xl px-4 py-3 shadow-sm ${
           isUser
             ? "bg-indigo-600 text-white rounded-tr-sm"
             : "bg-white text-gray-800 rounded-tl-sm border border-gray-100"
@@ -66,25 +66,48 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:150ms]" />
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:300ms]" />
           </div>
+        ) : isUser ? (
+          textContent
         ) : (
-          <Markdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeHighlight]}
-            components={{
-              table({ node, ...props }) {
-                return (
-                  <div className="overflow-x-auto my-2 overflow-hidden border border-gray-200 rounded-xl">
-                    <table
-                      {...props}
-                      className="w-full  border-collapse divide-y divide-gray-200 [&>tbody]:divide-y [&>tbody]:divide-gray-100 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold [&_th]:bg-gray-50 [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm"
-                    />
-                  </div>
-                );
-              },
-            }}
-          >
-            {textContent}
-          </Markdown>
+          <div className="prose prose-sm max-w-none">
+            <Markdown
+              allowedElements={[
+                "br",
+                "span",
+                "a",
+                "p",
+                "em",
+                "strong",
+                "code",
+                "pre",
+                "ul",
+                "ol",
+                "li",
+                "table",
+                "thead",
+                "tbody",
+                "tr",
+                "th",
+                "td",
+              ]}
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeHighlight]}
+              components={{
+                table({ node, ...props }) {
+                  return (
+                    <div className="overflow-x-auto my-2 overflow-hidden border border-gray-200 rounded-xl">
+                      <table
+                        {...props}
+                        className="w-full m-0! border-collapse divide-y divide-gray-200 [&>tbody]:divide-y [&>tbody]:divide-gray-100 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold [&_th]:bg-gray-50 [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm"
+                      />
+                    </div>
+                  );
+                },
+              }}
+            >
+              {textContent}
+            </Markdown>
+          </div>
         )}
       </div>
       {isUser && (
