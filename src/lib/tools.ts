@@ -1,4 +1,4 @@
-import type { Tool } from "ollama/browser";
+import type { Tool, ToolCall } from "ollama/browser";
 
 export const searchMoviesTool: Tool = {
   type: "function",
@@ -65,9 +65,43 @@ export const getMovieTool: Tool = {
   },
 };
 
-export const tools = getOmdbApiKey()
-  ? [searchMoviesTool, getMovieTool]
-  : undefined;
+export const getCurrentDateTimeTool: Tool = {
+  type: "function",
+  function: {
+    name: "get_current_datetime",
+    description:
+      "Get the user's current date/time and browser timezone information",
+  },
+};
+
+const tools = [getCurrentDateTimeTool];
+
+if (getOmdbApiKey()) {
+  tools.push(searchMoviesTool, getMovieTool);
+}
+
+const toolExecutors: Record<string, (args: unknown) => Promise<string>> = {
+  omdb_search: executeSearchMovies,
+  omdb_get: executeGetMovie,
+  get_current_datetime: executeGetCurrentDateTime,
+};
+
+export async function callTool(tool: ToolCall) {
+  const executor = toolExecutors[tool.function.name];
+  if (!executor)
+    return JSON.stringify({
+      error: `No executor found for tool ${tool.function.name}`,
+    });
+
+  try {
+    const result = await executor(tool.function.arguments);
+    return result;
+  } catch (err) {
+    return JSON.stringify({
+      error: err instanceof Error ? err.message : "Tool execution failed",
+    });
+  }
+}
 
 function parseArgs<T>(args: unknown): T {
   if (typeof args === "string") {
@@ -181,4 +215,18 @@ export async function executeGetMovie(args: unknown) {
   } catch {
     return JSON.stringify({ error: "Failed to fetch from OMDB API" });
   }
+}
+
+async function executeGetCurrentDateTime() {
+  const now = new Date();
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timezoneOffsetMinutes = -now.getTimezoneOffset();
+
+  return JSON.stringify({
+    now_iso: now.toISOString(),
+    now_local: now.toString(),
+    locale: navigator.language,
+    timezone,
+    timezone_offset_minutes: timezoneOffsetMinutes,
+  });
 }

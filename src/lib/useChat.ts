@@ -3,12 +3,7 @@ import type { ToolCall } from "ollama/browser";
 import { useRef, useState } from "react";
 import { useChatStore, type CustomMessage } from "../store/chatStore";
 import { sendChat, SYSTEM_PROMPTS } from "./ollama";
-import { executeGetMovie, executeSearchMovies } from "./tools";
-
-const toolExecutors: Record<string, (args: unknown) => Promise<string>> = {
-  omdb_search: executeSearchMovies,
-  omdb_get: executeGetMovie,
-};
+import { callTool } from "./tools";
 
 export function useChat({
   model,
@@ -99,12 +94,9 @@ export function useChat({
         let handledAny = false;
 
         for (const tool of calls) {
-          const executeTool = toolExecutors[tool.function.name];
-          if (!executeTool) continue;
-
           handledAny = true;
 
-          const result = await executeTool(tool.function.arguments);
+          const result = await callTool(tool);
 
           currentMessages.push({
             role: "tool",
