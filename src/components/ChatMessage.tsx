@@ -1,8 +1,12 @@
+import { ChevronRightIcon } from "lucide-react";
 import { useState } from "react";
-import type { UIMessage } from "@tanstack/ai-react";
+import Markdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
+import remarkGfm from "remark-gfm";
+import type { CustomMessage } from "../store/chatStore";
 
 interface ChatMessageProps {
-  message: UIMessage;
+  message: CustomMessage;
   isLastLoading?: boolean;
 }
 
@@ -10,23 +14,18 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
   const isUser = message.role === "user";
   const [thinkingOpen, setThinkingOpen] = useState(false);
 
-  const textThinking = message.parts
-    .filter((p) => p.type === "thinking")
-    .map((p) => p.content)
-    .join("");
+  const textThinking = message.thinking;
 
-  const textContent = message.parts
-    .filter((p) => p.type === "text")
-    .map((p) => p.content)
-    .join("");
+  const textContent = message.content;
 
   const showTypingIndicator = isLastLoading && !isUser && textContent === "";
-  const isThinking = isLastLoading && !isUser && textContent === "" && textThinking !== "";
+  const isThinking =
+    isLastLoading && !isUser && textContent === "" && textThinking !== "";
 
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}>
       {!isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center mr-3 mt-1">
+        <div className="shrink-0 w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center mr-3 mt-1">
           <span className="text-white text-xs font-bold">AI</span>
         </div>
       )}
@@ -46,7 +45,7 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
               <span
                 className={`inline-block transition-transform duration-200 ${thinkingOpen ? "rotate-90" : ""}`}
               >
-                ▶
+                <ChevronRightIcon size={14} />
               </span>
               {isThinking ? (
                 <span className="animate-pulse">Pensando...</span>
@@ -68,14 +67,32 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:300ms]" />
           </div>
         ) : (
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+          <Markdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeHighlight]}
+            components={{
+              table({ node, ...props }) {
+                return (
+                  <div className="overflow-x-auto my-2 overflow-hidden border border-gray-200 rounded-xl">
+                    <table
+                      {...props}
+                      className="w-full  border-collapse divide-y divide-gray-200 [&>tbody]:divide-y [&>tbody]:divide-gray-100 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold [&_th]:bg-gray-50 [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm"
+                    />
+                  </div>
+                );
+              },
+            }}
+          >
             {textContent}
-          </p>
+          </Markdown>
+          // <p className="text-sm leading-relaxed whitespace-pre-wrap">
+          //   {textContent}
+          // </p>
         )}
       </div>
       {isUser && (
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center ml-3 mt-1">
-          <span className="text-gray-700 text-xs font-bold">You</span>
+        <div className="shrink-0 w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center ml-3 mt-1">
+          <span className="text-gray-700 text-xs font-bold">Tú</span>
         </div>
       )}
     </div>

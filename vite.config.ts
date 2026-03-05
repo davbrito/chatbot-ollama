@@ -4,18 +4,13 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig((env) => {
-  const { OLLAMA_URL } = loadEnv(env.mode, process.cwd(), "");
+  const { OLLAMA_URL, GITHUB_TOKEN } = loadEnv(env.mode, process.cwd(), "");
   return {
     plugins: [react(), tailwindcss()],
     define: {
-      "import.meta.env.GITHUB_TOKEN": JSON.stringify(process.env.GITHUB_TOKEN),
-    },
-    resolve: {
-      alias: {
-        // Force the browser-compatible build of the ollama package so that
-        // Node.js built-ins (node:fs, node:path) are not bundled.
-        ollama: "ollama/browser",
-      },
+      "import.meta.env.GITHUB_TOKEN": GITHUB_TOKEN
+        ? JSON.stringify(GITHUB_TOKEN)
+        : undefined,
     },
     server: {
       proxy: {

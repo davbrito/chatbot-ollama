@@ -1,14 +1,17 @@
-import { useModelStore } from '../store/chatStore';
+import { useChatStore } from "../store/chatStore";
 
 export function ModelSelector() {
-  const { model, models, setModel } = useModelStore();
+  const { models, sessions, activeSessionId, setActiveSessionModel } = useChatStore();
+  const activeSession = sessions.find((session) => session.id === activeSessionId);
+  const model = activeSession?.model ?? "";
 
   if (models.length === 0) return null;
 
   return (
     <select
       value={model}
-      onChange={(e) => setModel(e.target.value)}
+      onChange={(e) => setActiveSessionModel(e.target.value)}
+      disabled={!activeSessionId}
       className="text-sm rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
     >
       {models.map((m) => (
