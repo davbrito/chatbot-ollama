@@ -5,7 +5,8 @@ export const searchMoviesTool: Tool = {
   function: {
     name: "omdb_search",
     description:
-      "Search OMDB and return a list of results using the s parameter",
+      "Search movies with a text search on OMDB and return a list of results " +
+      "and optional type, year and page parameters. Returning a list of matching movies.",
     parameters: {
       type: "object",
       properties: {
@@ -74,7 +75,7 @@ export const getCurrentDateTimeTool: Tool = {
   },
 };
 
-const tools = [getCurrentDateTimeTool];
+export const tools = [getCurrentDateTimeTool];
 
 if (getOmdbApiKey()) {
   tools.push(searchMoviesTool, getMovieTool);
