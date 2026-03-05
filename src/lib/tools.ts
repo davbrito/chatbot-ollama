@@ -1,6 +1,7 @@
 import type { Tool, ToolCall } from "ollama/browser";
 import { evaluate } from "mathjs";
 import { useConfigStore } from "../store/configStore";
+import { ollama } from "./ollama";
 
 const searchMoviesTool: Tool = {
   type: "function",
@@ -97,6 +98,32 @@ const mathCalculateTool: Tool = {
   },
 };
 
+const ollamaWebSearchTool: Tool = {
+  type: "function",
+  function: {
+    name: "web_search",
+    description:
+      "Search the web using Ollama Cloud (requires OLLAMA API key). Returns search results or an error.",
+    parameters: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "Text query to search" },
+        maxResults: {
+          type: "number",
+          description: "Maximum number of search results to return",
+        },
+      },
+      required: ["query"],
+    },
+  },
+};
+
+function getOmdbApiKey() {
+  const apiKey = useConfigStore.getState().getOmdbApiKey();
+  if (!apiKey) return null;
+  return apiKey;
+}
+
 export const tools = [
   getCurrentDateTimeTool,
   mathCalculateTool,
@@ -104,11 +131,18 @@ export const tools = [
   getMovieTool,
 ];
 
-const toolExecutors: Record<string, (args: unknown) => Promise<string>> = {
+declare const HAS_OLLAMA_API_KEY: boolean;
+
+if (HAS_OLLAMA_API_KEY) {
+  tools.push(ollamaWebSearchTool);
+}
+
+const toolExecutors: Record<string, (args: any) => Promise<string>> = {
   search_movies: executeSearchMovies,
   get_movie: executeGetMovie,
   get_current_datetime: executeGetCurrentDateTime,
   math_calculate: executeMathCalculate,
+  web_search: executeOllamaWebSearch,
 };
 
 export async function callTool(tool: ToolCall) {
@@ -145,12 +179,6 @@ function appendOptional(url: URL, key: string, value?: string | number) {
   const text = String(value).trim();
   if (!text) return;
   url.searchParams.set(key, text);
-}
-
-function getOmdbApiKey() {
-  const apiKey = useConfigStore.getState().getOmdbApiKey();
-  if (!apiKey) return null;
-  return apiKey;
 }
 
 export async function executeSearchMovies(args: unknown) {
@@ -275,4 +303,22 @@ async function executeMathCalculate(args: unknown) {
         err instanceof Error ? err.message : "Invalid mathematical expression",
     });
   }
+}
+
+export async function executeOllamaWebSearch(args: unknown) {
+  const parsedArgs = parseArgs<{
+    query?: string;
+    maxResults?: number;
+  }>(args);
+
+  const query = parsedArgs?.query?.trim();
+  if (!query)
+    return JSON.stringify({ error: "Missing required argument: query" });
+
+  const response = await ollama.webSearch({
+    query,
+    maxResults: parsedArgs.maxResults,
+  });
+
+  return JSON.stringify(response);
 }

@@ -8,6 +8,9 @@ export default defineConfig((env) => {
   const { OLLAMA_URL, OLLAMA_API_KEY } = loadEnv(env.mode, process.cwd(), "");
   return {
     plugins: [react(), tailwindcss()],
+    define: {
+      HAS_OLLAMA_API_KEY: JSON.stringify(!!OLLAMA_API_KEY),
+    },
     server: {
       proxy: {
         "/api": {
