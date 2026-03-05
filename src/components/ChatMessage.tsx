@@ -1,4 +1,4 @@
-import { ChevronRightIcon } from "lucide-react";
+import { ChevronRightIcon, LoaderCircleIcon } from "lucide-react";
 import { useState } from "react";
 import Markdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
@@ -52,6 +52,9 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
               ) : (
                 <span>Razonamiento</span>
               )}
+              {isLastLoading && (
+                <LoaderCircleIcon size={12} className={`animate-spin`} />
+              )}
             </button>
             {thinkingOpen && (
               <div className="mt-2 text-xs text-gray-500 italic bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
@@ -71,25 +74,6 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
         ) : (
           <div className="prose prose-sm max-w-none">
             <Markdown
-              allowedElements={[
-                "br",
-                "span",
-                "a",
-                "p",
-                "em",
-                "strong",
-                "code",
-                "pre",
-                "ul",
-                "ol",
-                "li",
-                "table",
-                "thead",
-                "tbody",
-                "tr",
-                "th",
-                "td",
-              ]}
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeHighlight]}
               components={{
