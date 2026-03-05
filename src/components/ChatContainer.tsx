@@ -17,12 +17,15 @@ export function ChatContainer({ model }: { model: string }) {
     model,
     sessionId: activeSessionId,
   });
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const conainerRef = useRef<HTMLDivElement>(null);
 
   const messageCount = messages.length;
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    conainerRef.current?.scrollTo({
+      top: conainerRef.current.scrollHeight,
+      behavior: "smooth",
+    });
   }, [messageCount]);
 
   const renderMessages = messages.filter((message) => message.role !== "tool");
@@ -38,7 +41,7 @@ export function ChatContainer({ model }: { model: string }) {
     <>
       <ChatHeader hasMessages={messages.length > 0} onClear={handleClear} />
 
-      <main className="flex-1 overflow-y-auto px-4 py-6">
+      <main className="flex-1 overflow-y-auto px-4 py-6" ref={conainerRef}>
         <div className="max-w-4xl mx-auto">
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
@@ -66,8 +69,6 @@ export function ChatContainer({ model }: { model: string }) {
               }
             />
           ))}
-
-          <div ref={bottomRef} />
         </div>
       </main>
 

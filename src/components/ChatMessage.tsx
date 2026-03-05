@@ -1,8 +1,12 @@
+import "katex/dist/katex.min.css";
+
 import { ChevronRightIcon, LoaderCircleIcon } from "lucide-react";
 import { useState } from "react";
 import Markdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
+import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import type { CustomMessage } from "../store/chatStore";
 
 interface ChatMessageProps {
@@ -74,8 +78,8 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
         ) : (
           <div className="prose prose-sm max-w-none">
             <Markdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeHighlight]}
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeHighlight, rehypeKatex]}
               components={{
                 table({ node, ...props }) {
                   return (
