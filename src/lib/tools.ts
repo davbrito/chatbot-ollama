@@ -1,6 +1,7 @@
 import type { Tool, ToolCall } from "ollama/browser";
+import { evaluate } from "mathjs";
 
-export const searchMoviesTool: Tool = {
+const searchMoviesTool: Tool = {
   type: "function",
   function: {
     name: "omdb_search",
@@ -32,7 +33,7 @@ export const searchMoviesTool: Tool = {
   },
 };
 
-export const getMovieTool: Tool = {
+const getMovieTool: Tool = {
   type: "function",
   function: {
     name: "omdb_get",
@@ -66,7 +67,7 @@ export const getMovieTool: Tool = {
   },
 };
 
-export const getCurrentDateTimeTool: Tool = {
+const getCurrentDateTimeTool: Tool = {
   type: "function",
   function: {
     name: "get_current_datetime",
@@ -75,7 +76,27 @@ export const getCurrentDateTimeTool: Tool = {
   },
 };
 
-export const tools = [getCurrentDateTimeTool];
+const mathCalculateTool: Tool = {
+  type: "function",
+  function: {
+    name: "math_calculate",
+    description:
+      "Evaluate a mathematical expression and return the numeric result. Uses mathjs syntax, e.g. (2 + 3) * 4 or sqrt(81)",
+    parameters: {
+      type: "object",
+      properties: {
+        expression: {
+          type: "string",
+          description:
+            "Mathematical expression to evaluate, e.g. (2 + 3) * 4 or sqrt(81)",
+        },
+      },
+      required: ["expression"],
+    },
+  },
+};
+
+export const tools = [getCurrentDateTimeTool, mathCalculateTool];
 
 if (getOmdbApiKey()) {
   tools.push(searchMoviesTool, getMovieTool);
@@ -85,6 +106,7 @@ const toolExecutors: Record<string, (args: unknown) => Promise<string>> = {
   omdb_search: executeSearchMovies,
   omdb_get: executeGetMovie,
   get_current_datetime: executeGetCurrentDateTime,
+  math_calculate: executeMathCalculate,
 };
 
 export async function callTool(tool: ToolCall) {
@@ -230,4 +252,23 @@ async function executeGetCurrentDateTime() {
     timezone,
     timezone_offset_minutes: timezoneOffsetMinutes,
   });
+}
+
+async function executeMathCalculate(args: unknown) {
+  const parsedArgs = parseArgs<{ expression?: string }>(args);
+  const expression = parsedArgs?.expression?.trim();
+
+  if (!expression) {
+    return JSON.stringify({ error: "Missing required argument: expression" });
+  }
+
+  try {
+    const result = evaluate(expression);
+    return JSON.stringify({ expression, result });
+  } catch (err) {
+    return JSON.stringify({
+      error:
+        err instanceof Error ? err.message : "Invalid mathematical expression",
+    });
+  }
 }
