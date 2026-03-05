@@ -9,17 +9,31 @@ interface ConfigState {
   setTtsProvider: (p: TTSProviderName) => void;
   setElevenlabsApiKey: (k: string) => void;
   setElevenlabsVoice: (v: string) => void;
+  getElevenlabsApiKey(): string;
+  getElevenlabsVoice(): string;
 }
 
 export const useConfigStore = create<ConfigState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ttsProvider: "browser",
       elevenlabsApiKey: "",
-      elevenlabsVoice: "alloy",
+      elevenlabsVoice: "",
       setTtsProvider: (p: TTSProviderName) => set({ ttsProvider: p }),
       setElevenlabsApiKey: (k: string) => set({ elevenlabsApiKey: k }),
       setElevenlabsVoice: (v: string) => set({ elevenlabsVoice: v }),
+      getElevenlabsApiKey() {
+        return (
+          get().elevenlabsApiKey || import.meta.env.VITE_ELEVENLABS_API_KEY
+        );
+      },
+      getElevenlabsVoice() {
+        return (
+          get().elevenlabsVoice ||
+          import.meta.env.VITE_ELEVENLABS_VOICE_ID ||
+          "alloy"
+        );
+      },
     }),
     {
       name: "config",

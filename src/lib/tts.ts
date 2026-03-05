@@ -1,4 +1,5 @@
-import { ElevenLabsClient, play } from "@elevenlabs/elevenlabs-js";
+import useConfigStore from "@/store/configStore";
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 
 export type TTSProviderName = "browser" | "elevenlabs";
 
@@ -73,25 +74,14 @@ class ElevenLabsTTS implements TTSProvider {
     const result = await client.textToSpeech.convert(this.voice, {
       text: text,
       modelId: this.model,
+      languageCode: "es",
     });
 
-    await play(result);
-
-    // result may be a Blob, Response-like, or have data/arrayBuffer
-    let blob: Blob | null = null;
-    if (result instanceof Blob) {
-      blob = result;
-    } else if (result?.arrayBuffer) {
-      const ab = await result.arrayBuffer();
-      blob = new Blob([ab], { type: "audio/mpeg" });
-    } else if (result?.data) {
-      blob = new Blob([result.data], { type: "audio/mpeg" });
-    }
-
-    if (!blob) throw new Error("SDK returned unexpected audio format");
+    const blob = await new Response(result).blob();
 
     const src = URL.createObjectURL(blob);
     const audio = new Audio(src);
+
     this.audio = audio;
     this.speaking = true;
 
@@ -139,8 +129,8 @@ export function setTTSProvider(name: TTSProviderName) {
     active = browser;
   } else if (name === "elevenlabs") {
     active = new ElevenLabsTTS({
-      apiKey: import.meta.env.VITE_ELEVENLABS_API_KEY,
-      voice: import.meta.env.VITE_ELEVENLABS_VOICE_ID!,
+      apiKey: useConfigStore.getState().getElevenlabsApiKey(),
+      voice: useConfigStore.getState().getElevenlabsVoice(),
       model: "eleven_flash_v2_5",
     });
   }
