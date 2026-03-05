@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useChatStore } from "../store/chatStore";
+import useConfigStore from "../store/configStore";
 import { Button } from "./ui/button";
 
 export function ChatSidebar() {
@@ -26,7 +27,13 @@ export function ChatSidebar() {
   const activeSession = sessions.find(
     (session) => session.id === activeSessionId,
   );
-  const activeModel = activeSession?.model ?? models[0]?.name ?? "";
+  const getDefaultModel = useConfigStore((s) => s.getDefaultModel);
+  const preferredModel = getDefaultModel();
+  const activeModel =
+    activeSession?.model ??
+    models.find((m) => m.name === preferredModel)?.name ??
+    models[0]?.name ??
+    "";
 
   const sortedSessions = [...sessions].sort(
     (a, b) => b.updatedAt - a.updatedAt,

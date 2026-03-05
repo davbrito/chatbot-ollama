@@ -1,5 +1,6 @@
 import type { Tool, ToolCall } from "ollama/browser";
 import { evaluate } from "mathjs";
+import { useConfigStore } from "../store/configStore";
 
 const searchMoviesTool: Tool = {
   type: "function",
@@ -96,11 +97,12 @@ const mathCalculateTool: Tool = {
   },
 };
 
-export const tools = [getCurrentDateTimeTool, mathCalculateTool];
-
-if (getOmdbApiKey()) {
-  tools.push(searchMoviesTool, getMovieTool);
-}
+export const tools = [
+  getCurrentDateTimeTool,
+  mathCalculateTool,
+  searchMoviesTool,
+  getMovieTool,
+];
 
 const toolExecutors: Record<string, (args: unknown) => Promise<string>> = {
   search_movies: executeSearchMovies,
@@ -146,11 +148,8 @@ function appendOptional(url: URL, key: string, value?: string | number) {
 }
 
 function getOmdbApiKey() {
-  const apiKey = import.meta.env.VITE_OMDB_API_KEY;
-  if (!apiKey) {
-    return null;
-  }
-
+  const apiKey = useConfigStore.getState().getOmdbApiKey();
+  if (!apiKey) return null;
   return apiKey;
 }
 

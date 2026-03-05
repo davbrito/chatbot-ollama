@@ -2,37 +2,54 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { setTTSProvider, type TTSProviderName } from "../lib/tts";
 
+const initialTtsProvider =
+  (import.meta.env.VITE_TTS_PROVIDER as TTSProviderName) || "browser";
+const initialElevenlabsApiKey = import.meta.env.VITE_ELEVENLABS_API_KEY || "";
+const initialElevenlabsVoice = import.meta.env.VITE_ELEVENLABS_VOICE_ID || "";
+const initialDefaultModel = import.meta.env.VITE_DEFAULT_MODEL || "";
+const initialOmdbApiKey = import.meta.env.VITE_OMDB_API_KEY || "";
+
 interface ConfigState {
   ttsProvider: TTSProviderName;
   elevenlabsApiKey: string;
   elevenlabsVoice: string;
+  defaultModel: string;
+  omdbApiKey: string;
   setTtsProvider: (p: TTSProviderName) => void;
   setElevenlabsApiKey: (k: string) => void;
   setElevenlabsVoice: (v: string) => void;
+  setDefaultModel: (m: string) => void;
+  setOmdbApiKey: (k: string) => void;
   getElevenlabsApiKey(): string;
   getElevenlabsVoice(): string;
+  getDefaultModel(): string;
+  getOmdbApiKey(): string;
 }
 
 export const useConfigStore = create<ConfigState>()(
   persist(
     (set, get) => ({
-      ttsProvider: "browser",
-      elevenlabsApiKey: "",
-      elevenlabsVoice: "",
+      ttsProvider: initialTtsProvider,
+      elevenlabsApiKey: initialElevenlabsApiKey,
+      elevenlabsVoice: initialElevenlabsVoice,
+      defaultModel: initialDefaultModel,
+      omdbApiKey: initialOmdbApiKey,
       setTtsProvider: (p: TTSProviderName) => set({ ttsProvider: p }),
       setElevenlabsApiKey: (k: string) => set({ elevenlabsApiKey: k }),
       setElevenlabsVoice: (v: string) => set({ elevenlabsVoice: v }),
+      setDefaultModel: (m: string) => set({ defaultModel: m }),
+      setOmdbApiKey: (k: string) => set({ omdbApiKey: k }),
       getElevenlabsApiKey() {
-        return (
-          get().elevenlabsApiKey || import.meta.env.VITE_ELEVENLABS_API_KEY
-        );
+        return get().elevenlabsApiKey || initialElevenlabsApiKey;
       },
       getElevenlabsVoice() {
-        return (
-          get().elevenlabsVoice ||
-          import.meta.env.VITE_ELEVENLABS_VOICE_ID ||
-          "alloy"
-        );
+        return get().elevenlabsVoice || initialElevenlabsVoice || "alloy";
+      },
+      getDefaultModel() {
+        return get().defaultModel || initialDefaultModel;
+      },
+      getOmdbApiKey() {
+        return get().omdbApiKey || initialOmdbApiKey;
       },
     }),
     {

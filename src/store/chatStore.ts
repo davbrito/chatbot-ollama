@@ -3,6 +3,7 @@ import type { Message, ModelResponse } from "ollama/browser";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { listModels } from "../lib/ollama";
+import { useConfigStore } from "./configStore";
 
 export type CustomMessage = Message & { id: string; createdAt?: number };
 
@@ -87,7 +88,9 @@ export const useChatStore = create<ChatStateStore>()(
           return activeSessionId;
         }
 
-        const defaultModel = models[0]?.name;
+        const preferred = useConfigStore.getState().getDefaultModel();
+        const defaultModel =
+          models.find((m) => m.name === preferred)?.name ?? models[0]?.name;
         if (!defaultModel) {
           return null;
         }
@@ -119,7 +122,10 @@ export const useChatStore = create<ChatStateStore>()(
           );
 
           if (sessions.length === 0) {
-            const fallbackModel = state.models[0]?.name;
+            const preferred = useConfigStore.getState().getDefaultModel();
+            const fallbackModel =
+              state.models.find((m) => m.name === preferred)?.name ??
+              state.models[0]?.name;
             if (!fallbackModel) {
               return {
                 sessions: [],

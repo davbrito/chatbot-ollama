@@ -1,6 +1,11 @@
 import "katex/dist/katex.min.css";
 
-import { ChevronRightIcon, LoaderCircleIcon, Volume2Icon } from "lucide-react";
+import {
+  ChevronRightIcon,
+  LoaderCircleIcon,
+  StopCircleIcon,
+  Volume2Icon,
+} from "lucide-react";
 import { useState } from "react";
 import Markdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
@@ -14,6 +19,7 @@ import {
   stop as ttsStop,
 } from "../lib/tts";
 import type { CustomMessage } from "../store/chatStore";
+import { Button } from "./ui/button";
 
 interface ChatMessageProps {
   message: CustomMessage;
@@ -143,20 +149,18 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
             >
               {timeString}
             </div>
-            <button
+            <Button
+              variant="secondary"
+              size="icon-sm"
               onClick={toggleSpeak}
               aria-label={isSpeaking ? "Detener lectura" : "Leer en voz alta"}
-              className={`flex h-7 w-7 items-center justify-center rounded text-sm transition-colors select-none focus:outline-none ${
-                isUser
-                  ? "bg-indigo-500/20 text-indigo-100 hover:bg-indigo-500/30"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
             >
-              <Volume2Icon
-                size={14}
-                className={isSpeaking ? "animate-pulse" : ""}
-              />
-            </button>
+              {isSpeaking ? (
+                <StopCircleIcon className={"animate-pulse"} />
+              ) : (
+                <Volume2Icon className={isSpeaking ? "animate-pulse" : ""} />
+              )}
+            </Button>
           </div>
         )}
       </div>

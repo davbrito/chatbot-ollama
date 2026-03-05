@@ -1,4 +1,5 @@
 import { useChatStore } from "../store/chatStore";
+import useConfigStore from "../store/configStore";
 import {
   Select,
   SelectContent,
@@ -10,6 +11,7 @@ import {
 export function ModelSelector() {
   const { models, sessions, activeSessionId, setActiveSessionModel } =
     useChatStore();
+  const setDefaultModel = useConfigStore((s) => s.setDefaultModel);
   const activeSession = sessions.find(
     (session) => session.id === activeSessionId,
   );
@@ -20,7 +22,10 @@ export function ModelSelector() {
   return (
     <Select
       value={model}
-      onValueChange={(value) => setActiveSessionModel(value!)}
+      onValueChange={(value) => {
+        setActiveSessionModel(value!);
+        setDefaultModel(value!);
+      }}
       disabled={!activeSessionId}
     >
       <SelectTrigger className="min-w-40 border-none bg-transparent">
