@@ -1,5 +1,4 @@
 import { MessageCircleMoreIcon } from "lucide-react";
-import { ModelSelector } from "./ModelSelector";
 import { SettingsDialog } from "./SettingsDialog";
 
 interface ChatHeaderProps {
@@ -22,7 +21,6 @@ export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <ModelSelector />
         <SettingsDialog />
         {hasMessages && (
           <button

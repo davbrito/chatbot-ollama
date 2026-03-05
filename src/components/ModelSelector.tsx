@@ -1,4 +1,11 @@
 import { useChatStore } from "../store/chatStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 export function ModelSelector() {
   const { models, sessions, activeSessionId, setActiveSessionModel } =
@@ -11,19 +18,23 @@ export function ModelSelector() {
   if (models.length === 0) return null;
 
   return (
-    <select
+    <Select
       value={model}
-      onChange={(e) => setActiveSessionModel(e.target.value)}
+      onValueChange={(value) => setActiveSessionModel(value!)}
       disabled={!activeSessionId}
-      className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 focus:border-transparent focus:ring-2 focus:ring-indigo-500 focus:outline-none"
     >
-      {models
-        .toSorted((a, b) => a.name.localeCompare(b.name))
-        .map((m) => (
-          <option key={m.name} value={m.name}>
-            {m.name}
-          </option>
-        ))}
-    </select>
+      <SelectTrigger className="min-w-40 border-none bg-transparent">
+        <SelectValue placeholder="Selecciona un modelo" />
+      </SelectTrigger>
+      <SelectContent>
+        {models
+          .toSorted((a, b) => a.name.localeCompare(b.name))
+          .map((m) => (
+            <SelectItem key={m.name} value={m.name}>
+              {m.name}
+            </SelectItem>
+          ))}
+      </SelectContent>
+    </Select>
   );
 }

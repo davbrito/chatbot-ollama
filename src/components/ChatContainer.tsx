@@ -4,6 +4,7 @@ import { useChat } from "../lib/useChat";
 import { ChatHeader } from "./ChatHeader";
 import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
+import { ModelSelector } from "./ModelSelector";
 import { BotMessageSquareIcon } from "lucide-react";
 
 export function ChatContainer({ model }: { model: string }) {
@@ -86,6 +87,11 @@ export function ChatContainer({ model }: { model: string }) {
         }}
         onStop={stop}
       />
+      <div className="bg-white px-4 pb-3">
+        <div className="mx-auto flex max-w-4xl items-center justify-end">
+          <ModelSelector />
+        </div>
+      </div>
     </div>
   );
 }
