@@ -1,5 +1,6 @@
 import type { Message, ModelResponse } from "ollama/browser";
 import { Ollama as OllamaClient } from "ollama/browser";
+import { tools } from "./tools";
 
 export const SYSTEM_PROMPTS: Message[] = [
   { role: "system", content: "Eres un asistente experto en películas." },
@@ -13,4 +14,8 @@ export const ollama = new OllamaClient({
 export async function listModels(): Promise<ModelResponse[]> {
   const { models } = await ollama.list();
   return models;
+}
+
+export function sendChat(model: string, messages: Message[]) {
+  return ollama.chat({ model, messages, stream: true, tools });
 }

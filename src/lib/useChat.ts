@@ -2,8 +2,8 @@ import { produce, type WritableDraft } from "immer";
 import type { ToolCall } from "ollama/browser";
 import { useRef, useState } from "react";
 import { useChatStore, type CustomMessage } from "../store/chatStore";
-import { ollama, SYSTEM_PROMPTS } from "./ollama";
-import { executeGetMovie, executeSearchMovies, tools } from "./tools";
+import { sendChat, SYSTEM_PROMPTS } from "./ollama";
+import { executeGetMovie, executeSearchMovies } from "./tools";
 
 const toolExecutors: Record<string, (args: unknown) => Promise<string>> = {
   omdb_search: executeSearchMovies,
@@ -132,12 +132,7 @@ export function useChat({
       while (isToolCall) {
         isToolCall = false;
 
-        const stream = await ollama.chat({
-          model,
-          messages: currentMessages,
-          stream: true,
-          tools,
-        });
+        const stream = await sendChat(model, currentMessages);
 
         const toolCalls: ToolCall[] = [];
         let assistantContent = "";
