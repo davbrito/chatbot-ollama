@@ -67,6 +67,7 @@ export const useChatStore = create<ChatStateStore>()(
       fetchModels: async () => {
         try {
           const models = await listModels();
+          models.sort((a, b) => a.name.localeCompare(b.name));
           set({ models, error: null });
         } catch (err) {
           set({
