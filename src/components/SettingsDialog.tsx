@@ -11,7 +11,7 @@ import {
   DialogClose,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { PasswordInput } from "./PasswordInput";
 import {
   Field,
   FieldContent,
@@ -59,8 +59,7 @@ export function SettingsDialog() {
               <Field>
                 <FieldLabel>OMDb API Key</FieldLabel>
                 <FieldContent>
-                  <Input
-                    type="password"
+                  <PasswordInput
                     placeholder="OMDb API Key"
                     value={omdbApiKey}
                     onChange={(e) => setOmdbApiKey(e.target.value)}

@@ -54,8 +54,14 @@ export function useChat({
   };
 
   const clear = () => {
-    setMessages(() => []);
+    setMessages((m) => {
+      m.length = 0;
+    });
     stop();
+    setError(null);
+  };
+
+  const clearError = () => {
     setError(null);
   };
 
@@ -197,5 +203,6 @@ export function useChat({
     isLoading,
     error,
     clear,
+    clearError,
   };
 }

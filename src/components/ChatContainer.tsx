@@ -5,7 +5,8 @@ import { ChatHeader } from "./ChatHeader";
 import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
 import { ModelSelector } from "./ModelSelector";
-import { BotMessageSquareIcon } from "lucide-react";
+import { BotMessageSquareIcon, XIcon } from "lucide-react";
+import { Button } from "./ui/button";
 
 export function ChatContainer({ model }: { model: string }) {
   const { sessions, activeSessionId, clearActiveSession, updateSessionTitle } =
@@ -14,10 +15,11 @@ export function ChatContainer({ model }: { model: string }) {
     (session) => session.id === activeSessionId,
   );
 
-  const { messages, sendMessage, stop, isLoading, error, clear } = useChat({
-    model,
-    sessionId: activeSessionId,
-  });
+  const { messages, sendMessage, stop, isLoading, error, clear, clearError } =
+    useChat({
+      model,
+      sessionId: activeSessionId,
+    });
   const conainerRef = useRef<HTMLDivElement>(null);
 
   const messageCount = messages.length;
@@ -28,7 +30,6 @@ export function ChatContainer({ model }: { model: string }) {
       behavior: "smooth",
     });
   }, [messageCount]);
-
   const renderMessages = messages.filter((message) => message.role !== "tool");
   const lastMessage = renderMessages.at(-1);
   const lastIsAssistantLoading = isLoading && lastMessage?.role === "assistant";
@@ -39,7 +40,7 @@ export function ChatContainer({ model }: { model: string }) {
   };
 
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+    <div className="isolate flex min-h-0 min-w-0 flex-1 flex-col">
       <ChatHeader hasMessages={messages.length > 0} onClear={handleClear} />
 
       <main
@@ -48,9 +49,21 @@ export function ChatContainer({ model }: { model: string }) {
       >
         <div className="mx-auto max-w-4xl">
           {error && (
-            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-              <strong>Error:</strong>{" "}
-              {error instanceof Error ? error.message : String(error)}
+            <div className="sticky top-0 mb-4 flex items-start justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              <div>
+                <strong>Error:</strong>{" "}
+                {error instanceof Error ? error.message : String(error)}
+              </div>
+              <Button
+                type="button"
+                onClick={() => clearError()}
+                variant="ghost"
+                size="icon"
+                className="shrink-0 text-red-600 hover:bg-red-100 hover:text-red-700"
+                aria-label="Cerrar error"
+              >
+                <XIcon className="h-4 w-4" />
+              </Button>
             </div>
           )}
 

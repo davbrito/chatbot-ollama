@@ -7,6 +7,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "./ui/field";
+import { PasswordInput } from "./PasswordInput";
 import {
   Select,
   SelectContent,
@@ -51,8 +52,7 @@ export function TTSProviderSelector() {
           <Field>
             <FieldLabel>API Key</FieldLabel>
             <FieldContent>
-              <Input
-                type="password"
+              <PasswordInput
                 placeholder="API Key"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}

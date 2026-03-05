@@ -8,7 +8,7 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
   return (
-    <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 shadow-sm">
+    <header className="z-10 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 shadow-sm">
       <div className="flex items-center gap-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600">
           <MessageCircleMoreIcon className="fill-white stroke-indigo-600" />
