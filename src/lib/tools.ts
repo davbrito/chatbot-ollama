@@ -4,16 +4,16 @@ import { evaluate } from "mathjs";
 const searchMoviesTool: Tool = {
   type: "function",
   function: {
-    name: "omdb_search",
+    name: "search_movies",
     description:
-      "Search movies with a text search on OMDB and return a list of results " +
+      "Search movies with a text search and return a list of results " +
       "and optional type, year and page parameters. Returning a list of matching movies.",
     parameters: {
       type: "object",
       properties: {
         query: {
           type: "string",
-          description: "Title text to search (OMDB s parameter)",
+          description: "Title text to search",
         },
         type: {
           type: "string",
@@ -36,19 +36,19 @@ const searchMoviesTool: Tool = {
 const getMovieTool: Tool = {
   type: "function",
   function: {
-    name: "omdb_get",
+    name: "get_movie",
     description:
-      "Get a single movie/series/episode in OMDB by IMDb ID (i) or exact title (t)",
+      "Get a single movie/series/episode by IMDb ID (i) or exact title (t)",
     parameters: {
       type: "object",
       properties: {
         imdb_id: {
           type: "string",
-          description: "IMDb ID like tt0111161 (maps to OMDB i parameter)",
+          description: "IMDb ID like tt0111161",
         },
         title: {
           type: "string",
-          description: "Exact title (maps to OMDB t parameter)",
+          description: "Title to search, e.g. The Shawshank Redemption",
         },
         type: {
           type: "string",
@@ -103,8 +103,8 @@ if (getOmdbApiKey()) {
 }
 
 const toolExecutors: Record<string, (args: unknown) => Promise<string>> = {
-  omdb_search: executeSearchMovies,
-  omdb_get: executeGetMovie,
+  search_movies: executeSearchMovies,
+  get_movie: executeGetMovie,
   get_current_datetime: executeGetCurrentDateTime,
   math_calculate: executeMathCalculate,
 };
