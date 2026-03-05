@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { listModels } from "../lib/ollama";
 
-export type CustomMessage = Message & { id: string };
+export type CustomMessage = Message & { id: string; createdAt?: number };
 
 interface ChatState {
   models: ModelResponse[];

@@ -4,12 +4,18 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig((env) => {
-  const { OLLAMA_URL } = loadEnv(env.mode, process.cwd(), "");
+  const { OLLAMA_URL, OLLAMA_API_KEY } = loadEnv(env.mode, process.cwd(), "");
   return {
     plugins: [react(), tailwindcss()],
     server: {
       proxy: {
-        "/api": OLLAMA_URL,
+        "/api": {
+          target: OLLAMA_URL,
+          changeOrigin: true,
+          headers: {
+            Authorization: `Bearer ${OLLAMA_API_KEY}`,
+          },
+        },
       },
     },
   };

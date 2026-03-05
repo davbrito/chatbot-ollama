@@ -11,10 +11,6 @@ export const ollama = new OllamaClient({
   host: window.location.origin,
   headers: {
     "X-Github-Token": import.meta.env.GITHUB_TOKEN,
-
-    ...(import.meta.env.VITE_OLLAMA_API_KEY && {
-      Authorization: `Bearer ${import.meta.env.VITE_OLLAMA_API_KEY}`,
-    }),
   },
 });
 

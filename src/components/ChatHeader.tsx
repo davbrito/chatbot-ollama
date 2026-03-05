@@ -8,14 +8,14 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
   return (
-    <header className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white shadow-sm">
+    <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 shadow-sm">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600">
           <MessageCircleMoreIcon className="fill-white stroke-indigo-600" />
         </div>
         <div>
-          <h1 className="font-semibold text-gray-900 text-sm leading-tight">
-            Chatbot Ollama
+          <h1 className="text-sm leading-tight font-semibold text-gray-900">
+            Cinéfilo Michael
           </h1>
           <p className="text-xs text-gray-500">Impulsado por Ollama</p>
         </div>
@@ -25,7 +25,7 @@ export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
         {hasMessages && (
           <button
             onClick={onClear}
-            className="text-xs text-gray-500 hover:text-red-500 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100"
+            className="rounded-lg px-2 py-1 text-xs text-gray-500 transition-colors hover:bg-gray-100 hover:text-red-500"
           >
             Limpiar
           </button>

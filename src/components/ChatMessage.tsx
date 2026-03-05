@@ -26,6 +26,13 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
   const isThinking =
     isLastLoading && !isUser && textContent === "" && textThinking !== "";
 
+  const timeString = message.createdAt
+    ? new Date(message.createdAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : null;
+
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}>
       {!isUser && (
@@ -95,6 +102,15 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
             >
               {textContent}
             </Markdown>
+          </div>
+        )}
+        {timeString && (
+          <div
+            className={`mt-1 text-[11px] ${
+              isUser ? "text-indigo-100 text-right" : "text-gray-400 text-left"
+            }`}
+          >
+            {timeString}
           </div>
         )}
       </div>

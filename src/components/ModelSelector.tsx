@@ -18,7 +18,7 @@ export function ModelSelector() {
       className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 focus:border-transparent focus:ring-2 focus:ring-indigo-500 focus:outline-none"
     >
       {models
-        .sort((a, b) => a.name.localeCompare(b.name))
+        .toSorted((a, b) => a.name.localeCompare(b.name))
         .map((m) => (
           <option key={m.name} value={m.name}>
             {m.name}

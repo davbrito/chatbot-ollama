@@ -78,6 +78,9 @@ export function useChat({
       role: "assistant",
       content: "",
     };
+    const now = Date.now();
+    userMessage.createdAt = now;
+    assistantMessageInit.createdAt = now;
 
     setMessages((mssgs) => {
       mssgs.push(userMessage, assistantMessageInit);
@@ -110,6 +113,8 @@ export function useChat({
             tool_name: tool.function.name,
             content: result,
           };
+
+          toolMessageInit.createdAt = Date.now();
 
           setMessages((mssgs) => {
             mssgs.push(toolMessageInit);
