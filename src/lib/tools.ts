@@ -117,7 +117,12 @@ export async function callTool(tool: ToolCall) {
     });
 
   try {
+    console.log(
+      `Executing tool ${tool.function.name} with arguments:`,
+      tool.function.arguments,
+    );
     const result = await executor(tool.function.arguments);
+    console.log(`Result from tool ${tool.function.name}:`, result);
     return result;
   } catch (err) {
     return JSON.stringify({
