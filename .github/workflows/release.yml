@@ -2,8 +2,8 @@ name: Build and Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      ARCHIVE_NAME: chatbot-ollama-${{ github.ref_name }}.zip
+      ARCHIVE_NAME: chatbot-ollama-build-${{ github.run_number }}.zip
 
     steps:
       - name: Checkout code
@@ -44,5 +44,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: build-${{ github.run_number }}
           files: ${{ env.ARCHIVE_NAME }}
           generate_release_notes: true
