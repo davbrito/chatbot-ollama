@@ -315,10 +315,19 @@ export async function executeOllamaWebSearch(args: unknown) {
   if (!query)
     return JSON.stringify({ error: "Missing required argument: query" });
 
-  const response = await ollama.webSearch({
+  const content = JSON.stringify({
     query,
-    maxResults: parsedArgs.maxResults,
+    max_results: parsedArgs.maxResults ?? 5,
   });
 
-  return JSON.stringify(response);
+  const response = await fetch(`/api/web_search`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: content,
+  });
+  const data = await response.json();
+
+  return JSON.stringify(data);
 }
