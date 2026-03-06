@@ -1,4 +1,5 @@
 import { produce, type WritableDraft } from "immer";
+import throttle from "lodash-es/throttle";
 import type { ToolCall } from "ollama/browser";
 import { useRef, useState } from "react";
 import { useChatStore, type CustomMessage } from "../store/chatStore";
@@ -156,6 +157,15 @@ export function useChat({
         let assistantContent = "";
         let assistantThinking = "";
 
+        const update = throttle(() => {
+          updateMessage(assistantMessageInit.id, (assistantMessage) => {
+            if (assistantContent) assistantMessage.content = assistantContent;
+            if (assistantThinking)
+              assistantMessage.thinking = assistantThinking;
+            if (toolCalls.length > 0) assistantMessage.tool_calls = toolCalls;
+          });
+        }, 100);
+
         for await (const part of stream) {
           if (abortControllerRef.current?.signal.aborted) {
             break;
@@ -168,15 +178,10 @@ export function useChat({
             toolCalls.push(...part.message.tool_calls);
           }
 
-          updateMessage(assistantMessageInit.id, (assistantMessage) => {
-            assistantMessage.content += part.message.content;
-            assistantMessage.thinking ??= "";
-            assistantMessage.thinking += part.message.thinking ?? "";
-            if (toolCalls.length > 0) {
-              assistantMessage.tool_calls = toolCalls;
-            }
-          });
+          update();
         }
+
+        update.flush();
 
         if (abortControllerRef.current?.signal.aborted) {
           break;
