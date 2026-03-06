@@ -1,6 +1,6 @@
 import type { Message, ModelResponse } from "ollama/browser";
 import { Ollama as OllamaClient } from "ollama/browser";
-import systemPromptText from "../assets/SYSTEM_PROMPT.md?raw";
+import systemPromptText from "../assets/SYSTEM_PROMPT2.md?raw";
 import { tools } from "./tools";
 
 export const SYSTEM_PROMPTS: Message[] = [
