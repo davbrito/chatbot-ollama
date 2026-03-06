@@ -6,7 +6,7 @@ import {
   StopCircleIcon,
   Volume2Icon,
 } from "lucide-react";
-import { useState } from "react";
+import { memo, useState } from "react";
 import Markdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
@@ -26,7 +26,10 @@ interface ChatMessageProps {
   isLastLoading?: boolean;
 }
 
-export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
+export const ChatMessage = memo(function ChatMessage({
+  message,
+  isLastLoading,
+}: ChatMessageProps) {
   const isUser = message.role === "user";
   const [thinkingOpen, setThinkingOpen] = useState(false);
 
@@ -171,4 +174,4 @@ export function ChatMessage({ message, isLastLoading }: ChatMessageProps) {
       )}
     </div>
   );
-}
+});

@@ -10,7 +10,8 @@ export type CustomMessage = Message & { id: string; createdAt?: number };
 interface ChatState {
   models: ModelResponse[];
   error: string | null;
-  sessions: ChatSession[];
+  sessionsById: Record<string, ChatSession>;
+  sessionOrder: string[];
   activeSessionId: string | null;
 }
 
@@ -56,12 +57,19 @@ function generateChatSession(model: string): ChatSession {
   };
 }
 
+function sortSessionOrder(sessionsById: Record<string, ChatSession>) {
+  return Object.values(sessionsById)
+    .sort((a, b) => b.updatedAt - a.updatedAt)
+    .map((session) => session.id);
+}
+
 export const useChatStore = create<ChatStateStore>()(
   persist(
     (set, get) => ({
       models: [],
       error: null,
-      sessions: [],
+      sessionsById: {},
+      sessionOrder: [],
       activeSessionId: null,
 
       fetchModels: async () => {
@@ -80,10 +88,9 @@ export const useChatStore = create<ChatStateStore>()(
       },
 
       ensureActiveSession: () => {
-        const { activeSessionId, sessions, models } = get();
+        const { activeSessionId, sessionsById, models } = get();
         const activeExists =
-          activeSessionId !== null &&
-          sessions.some((session) => session.id === activeSessionId);
+          activeSessionId !== null && activeSessionId in sessionsById;
 
         if (activeExists && activeSessionId) {
           return activeSessionId;
@@ -97,8 +104,14 @@ export const useChatStore = create<ChatStateStore>()(
         }
 
         const newSession = generateChatSession(defaultModel);
+        const nextSessions = {
+          ...sessionsById,
+          [newSession.id]: newSession,
+        };
+
         set({
-          sessions: [newSession, ...sessions],
+          sessionsById: nextSessions,
+          sessionOrder: sortSessionOrder(nextSessions),
           activeSessionId: newSession.id,
         });
 
@@ -108,47 +121,63 @@ export const useChatStore = create<ChatStateStore>()(
       createSession: (model) => {
         const newSession = generateChatSession(model);
 
-        set((state) => ({
-          sessions: [newSession, ...state.sessions],
-          activeSessionId: newSession.id,
-        }));
+        set((state) => {
+          const nextSessions = {
+            ...state.sessionsById,
+            [newSession.id]: newSession,
+          };
+
+          return {
+            sessionsById: nextSessions,
+            sessionOrder: sortSessionOrder(nextSessions),
+            activeSessionId: newSession.id,
+          };
+        });
 
         return newSession.id;
       },
 
       deleteSession: (sessionId) => {
         set((state) => {
-          const sessions = state.sessions.filter(
-            (session) => session.id !== sessionId,
-          );
+          const { [sessionId]: _, ...remainingSessions } = state.sessionsById;
+          const remainingIds = Object.keys(remainingSessions);
 
-          if (sessions.length === 0) {
+          if (remainingIds.length === 0) {
             const preferred = useConfigStore.getState().getDefaultModel();
             const fallbackModel =
               state.models.find((m) => m.name === preferred)?.name ??
               state.models[0]?.name;
             if (!fallbackModel) {
               return {
-                sessions: [],
+                sessionsById: {},
+                sessionOrder: [],
                 activeSessionId: null,
               };
             }
 
             const newSession = generateChatSession(fallbackModel);
             return {
-              sessions: [newSession],
+              sessionsById: {
+                [newSession.id]: newSession,
+              },
+              sessionOrder: [newSession.id],
               activeSessionId: newSession.id,
             };
           }
 
           if (state.activeSessionId === sessionId) {
+            const nextOrder = sortSessionOrder(remainingSessions);
             return {
-              sessions,
-              activeSessionId: sessions[0].id,
+              sessionsById: remainingSessions,
+              sessionOrder: nextOrder,
+              activeSessionId: nextOrder[0] ?? null,
             };
           }
 
-          return { sessions };
+          return {
+            sessionsById: remainingSessions,
+            sessionOrder: sortSessionOrder(remainingSessions),
+          };
         });
       },
 
@@ -157,68 +186,84 @@ export const useChatStore = create<ChatStateStore>()(
       },
 
       setActiveSessionModel: (model) => {
-        const { activeSessionId, sessions } = get();
+        const { activeSessionId, sessionsById } = get();
         if (!activeSessionId) return;
 
+        const session = sessionsById[activeSessionId];
+        if (!session) return;
+
+        const updatedSession = {
+          ...session,
+          model,
+          updatedAt: Date.now(),
+        };
+
+        const nextSessions = {
+          ...sessionsById,
+          [activeSessionId]: updatedSession,
+        };
+
         set({
-          sessions: sessions.map((session) =>
-            session.id === activeSessionId
-              ? {
-                  ...session,
-                  model,
-                  updatedAt: Date.now(),
-                }
-              : session,
-          ),
+          sessionsById: nextSessions,
+          sessionOrder: sortSessionOrder(nextSessions),
         });
       },
 
       clearActiveSession: () => {
-        const { activeSessionId, sessions } = get();
+        const { activeSessionId, sessionsById } = get();
         if (!activeSessionId) return;
 
+        const session = sessionsById[activeSessionId];
+        if (!session) return;
+
         const now = Date.now();
+        const updatedSession = {
+          ...session,
+          messages: [],
+          title: "Nuevo chat",
+          updatedAt: now,
+        };
+        const nextSessions = {
+          ...sessionsById,
+          [activeSessionId]: updatedSession,
+        };
+
         set({
-          sessions: sessions.map((session) =>
-            session.id === activeSessionId
-              ? {
-                  ...session,
-                  messages: [],
-                  title: "Nuevo chat",
-                  updatedAt: now,
-                }
-              : session,
-          ),
+          sessionsById: nextSessions,
+          sessionOrder: sortSessionOrder(nextSessions),
         });
       },
       updateSessionTitle(sessionId, messages): void {
         set((state) =>
           produce(state, (state) => {
-            const session = state.sessions.find((s) => s.id === sessionId);
+            const session = state.sessionsById[sessionId];
             if (session) {
               session.title = getSessionTitle(messages);
               session.updatedAt = Date.now();
             }
+            state.sessionOrder = sortSessionOrder(state.sessionsById);
           }),
         );
       },
       setSessionTitle(sessionId, title): void {
         set((state) =>
           produce(state, (state) => {
-            const session = state.sessions.find((s) => s.id === sessionId);
+            const session = state.sessionsById[sessionId];
             if (session) {
               session.title = title.trim();
               session.updatedAt = Date.now();
             }
+            state.sessionOrder = sortSessionOrder(state.sessionsById);
           }),
         );
       },
     }),
     {
       name: "chat",
-      version: 1,
+      version: 2,
       partialize: (state) => ({
-        sessions: state.sessions,
+        sessionsById: state.sessionsById,
+        sessionOrder: state.sessionOrder,
         activeSessionId: state.activeSessionId,
         error: null,
         models: [],

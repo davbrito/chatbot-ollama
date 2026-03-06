@@ -9,13 +9,18 @@ import {
 } from "./ui/select";
 
 export function ModelSelector() {
-  const { models, sessions, activeSessionId, setActiveSessionModel } =
-    useChatStore();
-  const setDefaultModel = useConfigStore((s) => s.setDefaultModel);
-  const activeSession = sessions.find(
-    (session) => session.id === activeSessionId,
+  const activeModel = useChatStore((state) =>
+    state.activeSessionId
+      ? state.sessionsById[state.activeSessionId]?.model
+      : undefined,
   );
-  const model = activeSession?.model ?? "";
+  const models = useChatStore((state) => state.models);
+  const activeSessionId = useChatStore((state) => state.activeSessionId);
+  const setActiveSessionModel = useChatStore(
+    (state) => state.setActiveSessionModel,
+  );
+  const setDefaultModel = useConfigStore((s) => s.setDefaultModel);
+  const model = activeModel ?? "";
 
   if (models.length === 0) return null;
 
@@ -32,13 +37,11 @@ export function ModelSelector() {
         <SelectValue placeholder="Selecciona un modelo" />
       </SelectTrigger>
       <SelectContent>
-        {models
-          .toSorted((a, b) => a.name.localeCompare(b.name))
-          .map((m) => (
-            <SelectItem key={m.name} value={m.name}>
-              {m.name}
-            </SelectItem>
-          ))}
+        {models.map((m) => (
+          <SelectItem key={m.name} value={m.name}>
+            {m.name}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { ErrorBoundary as REB, type FallbackProps } from "react-error-boundary";
 
 function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {

@@ -9,12 +9,11 @@ import { ModelSelector } from "./ModelSelector";
 import { Button } from "./ui/button";
 
 export function ChatContainer({ model }: { model: string }) {
-  const { activeSessionId, clearActiveSession, updateSessionTitle } =
-    useChatStore();
+  const activeSessionId = useChatStore((state) => state.activeSessionId);
+  const clearActiveSession = useChatStore((state) => state.clearActiveSession);
+  const updateSessionTitle = useChatStore((state) => state.setSessionTitle);
   const activeSessionHasTitle = useChatStore((state) => {
-    const sess = activeSessionId
-      ? state.sessions.find((session) => session.id === activeSessionId)
-      : null;
+    const sess = activeSessionId ? state.sessionsById[activeSessionId] : null;
     return sess?.title;
   });
 
@@ -25,7 +24,8 @@ export function ChatContainer({ model }: { model: string }) {
     });
   const conainerRef = useRef<HTMLDivElement>(null);
 
-  const messageCount = messages.length;
+  const renderMessages = messages.filter((message) => message.role !== "tool");
+  const messageCount = renderMessages;
 
   useEffect(() => {
     conainerRef.current?.scrollTo({
@@ -33,7 +33,7 @@ export function ChatContainer({ model }: { model: string }) {
       behavior: "smooth",
     });
   }, [messageCount]);
-  const renderMessages = messages.filter((message) => message.role !== "tool");
+
   const lastMessage = renderMessages.at(-1);
   const lastIsAssistantLoading = isLoading && lastMessage?.role === "assistant";
 

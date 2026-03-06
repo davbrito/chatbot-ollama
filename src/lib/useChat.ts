@@ -14,14 +14,28 @@ export function useChat({
 }) {
   const storeMessages =
     useChatStore((state) =>
-      sessionId
-        ? state.sessions.find((s) => s.id === sessionId)?.messages
-        : undefined,
+      sessionId ? state.sessionsById[sessionId]?.messages : undefined,
     ) ?? [];
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const updateMessage = (
+    messageId: string,
+    updater: (prev: WritableDraft<CustomMessage>) => void,
+  ) => {
+    if (!sessionId) return;
+    useChatStore.setState((state) =>
+      produce(state, (state) => {
+        const session = state.sessionsById[sessionId];
+        if (!session) return;
+        const message = session.messages.find((msg) => msg.id === messageId);
+        if (!message) return;
+        updater(message);
+      }),
+    );
+  };
 
   const setMessages = (
     updater: (prev: WritableDraft<CustomMessage>[]) => void,
@@ -29,19 +43,20 @@ export function useChat({
     if (!sessionId) return;
     useChatStore.setState((state) =>
       produce(state, (state) => {
-        const session = state.sessions.find((s) => s.id === sessionId);
+        const session = state.sessionsById[sessionId];
         if (!session) return;
         updater(session.messages);
         session.updatedAt = Date.now();
+        state.sessionOrder = Object.values(state.sessionsById)
+          .sort((a, b) => b.updatedAt - a.updatedAt)
+          .map((session) => session.id);
       }),
     );
   };
 
   const getMessages = () => {
     if (!sessionId) return [];
-    const session = useChatStore
-      .getState()
-      .sessions.find((s) => s.id === sessionId);
+    const session = useChatStore.getState().sessionsById[sessionId];
     return session?.messages ?? [];
   };
 
@@ -141,9 +156,7 @@ export function useChat({
         let assistantContent = "";
         let assistantThinking = "";
 
-        let partIndex = 0;
         for await (const part of stream) {
-          console.debug(`Received part ${partIndex++}`);
           if (abortControllerRef.current?.signal.aborted) {
             break;
           }
@@ -155,17 +168,12 @@ export function useChat({
             toolCalls.push(...part.message.tool_calls);
           }
 
-          setMessages((draft) => {
-            const assistantMessage = draft.find(
-              (msg) => msg.id === assistantMessageInit.id,
-            );
-            if (assistantMessage) {
-              assistantMessage.content += part.message.content;
-              assistantMessage.thinking ??= "";
-              assistantMessage.thinking += part.message.thinking ?? "";
-              if (toolCalls.length > 0) {
-                assistantMessage.tool_calls = toolCalls;
-              }
+          updateMessage(assistantMessageInit.id, (assistantMessage) => {
+            assistantMessage.content += part.message.content;
+            assistantMessage.thinking ??= "";
+            assistantMessage.thinking += part.message.thinking ?? "";
+            if (toolCalls.length > 0) {
+              assistantMessage.tool_calls = toolCalls;
             }
           });
         }

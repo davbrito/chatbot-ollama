@@ -12,9 +12,10 @@ export default function App() {
   );
   const models = useChatStore((state) => state.models);
 
-  const activeModel = useChatStore(
-    (state) =>
-      state.sessions.find((s) => s.id === state.activeSessionId)?.model,
+  const activeModel = useChatStore((state) =>
+    state.activeSessionId
+      ? state.sessionsById[state.activeSessionId]?.model
+      : undefined,
   );
 
   useEffect(() => {

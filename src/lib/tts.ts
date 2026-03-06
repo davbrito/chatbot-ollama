@@ -106,7 +106,7 @@ class ElevenLabsTTS implements TTSProvider {
       try {
         this.audio.pause();
         this.audio.currentTime = 0;
-      } catch (e) {
+      } catch {
         // ignore
       }
       this.audio = null;
