@@ -1,7 +1,6 @@
-import type { Tool, ToolCall } from "ollama/browser";
 import { evaluate } from "mathjs";
+import type { Tool, ToolCall } from "ollama/browser";
 import { useConfigStore } from "../store/configStore";
-import { ollama } from "./ollama";
 
 const searchMoviesTool: Tool = {
   type: "function",
