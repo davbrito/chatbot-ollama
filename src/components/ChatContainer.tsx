@@ -1,19 +1,22 @@
-import { useRef, useEffect } from "react";
-import { useChatStore } from "../store/chatStore";
+import { BotMessageSquareIcon, XIcon } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { useChat } from "../lib/useChat";
+import { useChatStore } from "../store/chatStore";
 import { ChatHeader } from "./ChatHeader";
 import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
 import { ModelSelector } from "./ModelSelector";
-import { BotMessageSquareIcon, XIcon } from "lucide-react";
 import { Button } from "./ui/button";
 
 export function ChatContainer({ model }: { model: string }) {
-  const { sessions, activeSessionId, clearActiveSession, updateSessionTitle } =
+  const { activeSessionId, clearActiveSession, updateSessionTitle } =
     useChatStore();
-  const activeSession = sessions.find(
-    (session) => session.id === activeSessionId,
-  );
+  const activeSessionHasTitle = useChatStore((state) => {
+    const sess = activeSessionId
+      ? state.sessions.find((session) => session.id === activeSessionId)
+      : null;
+    return sess?.title;
+  });
 
   const { messages, sendMessage, stop, isLoading, error, clear, clearError } =
     useChat({
@@ -94,8 +97,8 @@ export function ChatContainer({ model }: { model: string }) {
         isLoading={isLoading}
         onSend={(text) => {
           sendMessage(text);
-          if (!activeSession?.title && activeSession?.id) {
-            updateSessionTitle(activeSession.id, text);
+          if (!activeSessionHasTitle && activeSessionId) {
+            updateSessionTitle(activeSessionId, text);
           }
         }}
         onStop={stop}

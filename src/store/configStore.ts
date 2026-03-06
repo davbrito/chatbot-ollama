@@ -34,7 +34,13 @@ export const useConfigStore = create<ConfigState>()(
       elevenlabsVoice: initialElevenlabsVoice,
       defaultModel: initialDefaultModel,
       omdbApiKey: initialOmdbApiKey,
-      setTtsProvider: (p: TTSProviderName) => set({ ttsProvider: p }),
+      setTtsProvider: (p: TTSProviderName) => {
+        setTTSProvider(p, {
+          apiKey: get().getElevenlabsApiKey(),
+          voice: get().getElevenlabsVoice(),
+        });
+        return set({ ttsProvider: p });
+      },
       setElevenlabsApiKey: (k: string) => set({ elevenlabsApiKey: k }),
       setElevenlabsVoice: (v: string) => set({ elevenlabsVoice: v }),
       setDefaultModel: (m: string) => set({ defaultModel: m }),
@@ -57,7 +63,10 @@ export const useConfigStore = create<ConfigState>()(
       version: 1,
       onRehydrateStorage() {
         return function afterRehydrate(state) {
-          setTTSProvider(state?.ttsProvider || "browser");
+          setTTSProvider(state?.ttsProvider || "browser", {
+            apiKey: state?.getElevenlabsApiKey(),
+            voice: state?.getElevenlabsVoice(),
+          });
         };
       },
     },

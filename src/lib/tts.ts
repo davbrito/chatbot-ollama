@@ -1,4 +1,3 @@
-import useConfigStore from "@/store/configStore";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 
 export type TTSProviderName = "browser" | "elevenlabs";
@@ -124,13 +123,16 @@ class ElevenLabsTTS implements TTSProvider {
 const browser = new BrowserTTS();
 let active: TTSProvider = browser;
 
-export function setTTSProvider(name: TTSProviderName) {
+export function setTTSProvider(
+  name: TTSProviderName,
+  options?: { apiKey?: string; voice?: string },
+) {
   if (name === "browser") {
     active = browser;
   } else if (name === "elevenlabs") {
     active = new ElevenLabsTTS({
-      apiKey: useConfigStore.getState().getElevenlabsApiKey(),
-      voice: useConfigStore.getState().getElevenlabsVoice(),
+      apiKey: options?.apiKey ?? "",
+      voice: options?.voice || "alloy",
       model: "eleven_flash_v2_5",
     });
   }

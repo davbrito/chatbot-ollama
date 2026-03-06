@@ -141,7 +141,9 @@ export function useChat({
         let assistantContent = "";
         let assistantThinking = "";
 
+        let partIndex = 0;
         for await (const part of stream) {
+          console.debug(`Received part ${partIndex++}`);
           if (abortControllerRef.current?.signal.aborted) {
             break;
           }

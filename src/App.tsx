@@ -4,19 +4,18 @@ import { ChatContainer } from "./components/ChatContainer";
 import { ChatSidebar } from "./components/ChatSidebar";
 
 export default function App() {
-  const {
-    models,
-    sessions,
-    fetchModels,
-    error: modelsError,
-    activeSessionId,
-    ensureActiveSession,
-  } = useChatStore();
-
-  const activeSession = sessions.find(
-    (session) => session.id === activeSessionId,
+  const activeSessionId = useChatStore((state) => state.activeSessionId);
+  const modelsError = useChatStore((state) => state.error);
+  const fetchModels = useChatStore((state) => state.fetchModels);
+  const ensureActiveSession = useChatStore(
+    (state) => state.ensureActiveSession,
   );
-  const activeModel = activeSession?.model ?? "";
+  const models = useChatStore((state) => state.models);
+
+  const activeModel = useChatStore(
+    (state) =>
+      state.sessions.find((s) => s.id === state.activeSessionId)?.model,
+  );
 
   useEffect(() => {
     fetchModels();
