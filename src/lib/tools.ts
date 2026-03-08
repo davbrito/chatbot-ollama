@@ -126,8 +126,8 @@ function getOmdbApiKey() {
 export const tools = [
   getCurrentDateTimeTool,
   mathCalculateTool,
-  //searchMoviesTool,
-  //getMovieTool,
+  searchMoviesTool,
+  getMovieTool,
 ];
 
 declare const HAS_OLLAMA_API_KEY: boolean;
