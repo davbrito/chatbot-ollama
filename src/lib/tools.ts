@@ -123,17 +123,20 @@ function getOmdbApiKey() {
   return apiKey;
 }
 
-export const tools = [
-  getCurrentDateTimeTool,
-  mathCalculateTool,
-  searchMoviesTool,
-  getMovieTool,
-];
-
 declare const HAS_OLLAMA_API_KEY: boolean;
 
-if (HAS_OLLAMA_API_KEY) {
-  tools.push(ollamaWebSearchTool);
+export function getTools() {
+  const tools = [getCurrentDateTimeTool, mathCalculateTool];
+
+  if (getOmdbApiKey()) {
+    tools.unshift(searchMoviesTool, getMovieTool);
+  }
+
+  if (HAS_OLLAMA_API_KEY) {
+    tools.push(ollamaWebSearchTool);
+  }
+
+  return tools;
 }
 
 const toolExecutors: Record<string, (args: any) => Promise<string>> = {
@@ -180,7 +183,7 @@ function appendOptional(url: URL, key: string, value?: string | number) {
   url.searchParams.set(key, text);
 }
 
-export async function executeSearchMovies(args: unknown) {
+async function executeSearchMovies(args: unknown) {
   const parsedArgs = parseArgs<{
     query?: string;
     type?: string;
@@ -221,7 +224,7 @@ export async function executeSearchMovies(args: unknown) {
   }
 }
 
-export async function executeGetMovie(args: unknown) {
+async function executeGetMovie(args: unknown) {
   const parsedArgs = parseArgs<{
     imdb_id?: string;
     title?: string;
@@ -304,7 +307,7 @@ async function executeMathCalculate(args: unknown) {
   }
 }
 
-export async function executeOllamaWebSearch(args: unknown) {
+async function executeOllamaWebSearch(args: unknown) {
   const parsedArgs = parseArgs<{
     query?: string;
     maxResults?: number;
