@@ -1,0 +1,15 @@
+export const GENRE_OPTIONS = [
+  "Accion",
+  "Aventura",
+  "Animacion",
+  "Ciencia ficcion",
+  "Comedia",
+  "Crimen",
+  "Documental",
+  "Drama",
+  "Fantasia",
+  "Misterio",
+  "Romance",
+  "Terror",
+  "Thriller",
+] as const;

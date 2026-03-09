@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { setTTSProvider, type TTSProviderName } from "../lib/tts";
+import uniq from "lodash-es/uniq";
 
 const initialTtsProvider =
   (import.meta.env.VITE_TTS_PROVIDER as TTSProviderName) || "browser";
@@ -15,15 +16,18 @@ interface ConfigState {
   elevenlabsVoice: string;
   defaultModel: string;
   omdbApiKey: string;
+  favoriteGenres: string[];
   setTtsProvider: (p: TTSProviderName) => void;
   setElevenlabsApiKey: (k: string) => void;
   setElevenlabsVoice: (v: string) => void;
   setDefaultModel: (m: string) => void;
   setOmdbApiKey: (k: string) => void;
+  setFavoriteGenres: (genres: string[]) => void;
   getElevenlabsApiKey(): string;
   getElevenlabsVoice(): string;
   getDefaultModel(): string;
   getOmdbApiKey(): string;
+  getFavoriteGenres(): string[];
 }
 
 export const useConfigStore = create<ConfigState>()(
@@ -34,6 +38,7 @@ export const useConfigStore = create<ConfigState>()(
       elevenlabsVoice: initialElevenlabsVoice,
       defaultModel: initialDefaultModel,
       omdbApiKey: initialOmdbApiKey,
+      favoriteGenres: [],
       setTtsProvider: (p: TTSProviderName) => {
         setTTSProvider(p, {
           apiKey: get().getElevenlabsApiKey(),
@@ -45,6 +50,12 @@ export const useConfigStore = create<ConfigState>()(
       setElevenlabsVoice: (v: string) => set({ elevenlabsVoice: v }),
       setDefaultModel: (m: string) => set({ defaultModel: m }),
       setOmdbApiKey: (k: string) => set({ omdbApiKey: k }),
+      setFavoriteGenres: (genres: string[]) => {
+        const normalized = uniq(
+          genres.map((genre) => genre.trim()).filter(Boolean),
+        );
+        set({ favoriteGenres: normalized });
+      },
       getElevenlabsApiKey() {
         return get().elevenlabsApiKey || initialElevenlabsApiKey;
       },
@@ -56,6 +67,9 @@ export const useConfigStore = create<ConfigState>()(
       },
       getOmdbApiKey() {
         return get().omdbApiKey || initialOmdbApiKey;
+      },
+      getFavoriteGenres() {
+        return get().favoriteGenres;
       },
     }),
     {

@@ -2,7 +2,9 @@ import { ClapperboardIcon } from "lucide-react";
 import { useEffect } from "react";
 import { ChatContainer } from "./components/ChatContainer";
 import { ChatSidebar } from "./components/ChatSidebar";
+import { GenreOnboarding } from "./components/GenreOnboarding";
 import { useChatStore } from "./store/chatStore";
+import { useConfigStore } from "./store/configStore";
 
 export default function App() {
   const activeSessionId = useChatStore((state) => state.activeSessionId);
@@ -12,6 +14,8 @@ export default function App() {
     (state) => state.ensureActiveSession,
   );
   const models = useChatStore((state) => state.models);
+  const favoriteGenres = useConfigStore((state) => state.favoriteGenres);
+  const setFavoriteGenres = useConfigStore((state) => state.setFavoriteGenres);
 
   const activeModel = useChatStore((state) =>
     state.activeSessionId
@@ -27,6 +31,8 @@ export default function App() {
     ensureActiveSession();
   }, [models, ensureActiveSession]);
 
+  const shouldAskGenres = favoriteGenres.length === 0;
+
   return (
     <div className="cinema-surface isolate flex h-full flex-col overflow-hidden">
       {modelsError && (
@@ -35,7 +41,13 @@ export default function App() {
         </div>
       )}
 
-      {models.length === 0 && !modelsError ? (
+      {shouldAskGenres ? (
+        <GenreOnboarding
+          onSubmit={(genres) => {
+            setFavoriteGenres(genres);
+          }}
+        />
+      ) : models.length === 0 && !modelsError ? (
         <div className="relative flex flex-1 flex-col items-center justify-center text-amber-100/80">
           <div className="marquee-pulse pointer-events-none absolute inset-x-12 top-24 h-px bg-linear-to-r from-transparent via-amber-300/70 to-transparent" />
           <ClapperboardIcon className="mb-3 h-12 w-12 animate-bounce text-amber-300" />

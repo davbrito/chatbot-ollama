@@ -3,7 +3,8 @@ import throttle from "lodash-es/throttle";
 import type { ToolCall } from "ollama/browser";
 import { useRef, useState } from "react";
 import { useChatStore, type CustomMessage } from "../store/chatStore";
-import { sendChat, SYSTEM_PROMPTS } from "./ollama";
+import { useConfigStore } from "../store/configStore";
+import { buildSystemPrompts, sendChat } from "./ollama";
 import { callTool } from "./tools";
 
 export function useChat({
@@ -110,8 +111,9 @@ export function useChat({
 
     try {
       // System prompt from lib/ollama.ts
+      const favoriteGenres = useConfigStore.getState().getFavoriteGenres();
       const currentMessages = [
-        ...SYSTEM_PROMPTS,
+        ...buildSystemPrompts(favoriteGenres),
         ...getMessages().slice(0, -1),
       ];
 
