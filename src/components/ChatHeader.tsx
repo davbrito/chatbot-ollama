@@ -1,4 +1,4 @@
-import { MessageCircleMoreIcon } from "lucide-react";
+import { ClapperboardIcon } from "lucide-react";
 import { SettingsDialog } from "./SettingsDialog";
 
 interface ChatHeaderProps {
@@ -8,16 +8,18 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
   return (
-    <header className="z-10 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 shadow-sm">
+    <header className="z-10 flex items-center justify-between border-b border-amber-200/20 bg-gradient-to-r from-black/45 via-zinc-900/55 to-black/45 px-4 py-3 shadow-[0_10px_40px_rgba(0,0,0,0.35)] backdrop-blur-md">
       <div className="flex items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600">
-          <MessageCircleMoreIcon className="fill-white stroke-indigo-600" />
+        <div className="marquee-pulse flex h-9 w-9 items-center justify-center rounded-full border border-amber-300/70 bg-gradient-to-br from-amber-200 to-orange-500 text-zinc-900 shadow-[0_0_18px_rgba(251,191,36,0.45)]">
+          <ClapperboardIcon className="h-4 w-4" />
         </div>
         <div>
-          <h1 className="text-sm leading-tight font-semibold text-gray-900">
+          <h1 className="cinema-title text-sm leading-tight font-semibold tracking-[0.12em] text-amber-100 uppercase">
             Cinéfilo Michael
           </h1>
-          <p className="text-xs text-gray-500">Impulsado por Ollama</p>
+          <p className="text-[11px] tracking-[0.2em] text-amber-200/70 uppercase">
+            Sala privada · Ollama
+          </p>
         </div>
       </div>
       <div className="flex items-center gap-3">
@@ -25,7 +27,7 @@ export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
         {hasMessages && (
           <button
             onClick={onClear}
-            className="rounded-lg px-2 py-1 text-xs text-gray-500 transition-colors hover:bg-gray-100 hover:text-red-500"
+            className="rounded-lg border border-amber-300/25 px-2 py-1 text-xs text-amber-100/75 transition-colors hover:bg-amber-200/10 hover:text-amber-50"
           >
             Limpiar
           </button>

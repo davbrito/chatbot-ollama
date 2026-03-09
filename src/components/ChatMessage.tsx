@@ -73,22 +73,24 @@ export const ChatMessage = memo(function ChatMessage({
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}>
       {!isUser && (
-        <div className="mt-1 mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-600">
-          <span className="text-xs font-bold text-white">AI</span>
+        <div className="mt-1 mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-amber-300/50 bg-gradient-to-br from-amber-200 to-orange-500">
+          <span className="cinema-title text-[10px] font-bold tracking-[0.12em] text-zinc-900">
+            AI
+          </span>
         </div>
       )}
       <div
         className={`max-w-full rounded-2xl px-4 py-3 shadow-sm ${
           isUser
-            ? "rounded-tr-sm bg-indigo-600 text-white"
-            : "rounded-tl-sm border border-gray-100 bg-white text-gray-800"
+            ? "rounded-tr-sm border border-blue-200/35 bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-[0_10px_30px_rgba(30,64,175,0.35)]"
+            : "rounded-tl-sm border border-amber-100/15 bg-zinc-900/90 text-amber-50"
         }`}
       >
         {!isUser && textThinking && (
           <div className="mb-2">
             <button
               onClick={() => setThinkingOpen((v) => !v)}
-              className="flex items-center gap-1 text-xs font-medium text-indigo-500 transition-colors hover:text-indigo-700"
+              className="flex items-center gap-1 text-xs font-medium text-amber-300 transition-colors hover:text-amber-100"
             >
               <span
                 className={`inline-block transition-transform duration-200 ${thinkingOpen ? "rotate-90" : ""}`}
@@ -105,7 +107,7 @@ export const ChatMessage = memo(function ChatMessage({
               )}
             </button>
             {thinkingOpen && (
-              <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap text-gray-500 italic">
+              <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-amber-100/15 bg-black/35 px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap text-amber-50/70 italic">
                 {textThinking}
               </div>
             )}
@@ -118,19 +120,19 @@ export const ChatMessage = memo(function ChatMessage({
             <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:300ms]" />
           </div>
         ) : isUser ? (
-          textContent
+          <p className="whitespace-pre-wrap text-white">{textContent}</p>
         ) : (
-          <div className="prose prose-sm max-w-none">
+          <div className="prose prose-sm prose-invert max-w-none [&_*]:text-amber-50">
             <Markdown
               remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeHighlight, rehypeKatex]}
               components={{
                 table({ node, ...props }) {
                   return (
-                    <div className="my-2 overflow-hidden overflow-x-auto rounded-xl border border-gray-200">
+                    <div className="my-2 overflow-hidden overflow-x-auto rounded-xl border border-amber-100/20">
                       <table
                         {...props}
-                        className="m-0! w-full border-collapse divide-y divide-gray-200 [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm [&_th]:bg-gray-50 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold [&>tbody]:divide-y [&>tbody]:divide-gray-100"
+                        className="m-0! w-full border-collapse divide-y divide-amber-100/20 [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm [&_th]:bg-amber-100/10 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold [&>tbody]:divide-y [&>tbody]:divide-amber-100/10"
                       />
                     </div>
                   );
@@ -146,8 +148,8 @@ export const ChatMessage = memo(function ChatMessage({
             <div
               className={`text-[11px] ${
                 isUser
-                  ? "text-right text-indigo-100"
-                  : "text-left text-gray-400"
+                  ? "text-right text-white/70"
+                  : "text-left text-amber-50/60"
               }`}
             >
               {timeString}
@@ -168,8 +170,10 @@ export const ChatMessage = memo(function ChatMessage({
         )}
       </div>
       {isUser && (
-        <div className="mt-1 ml-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-300">
-          <span className="text-xs font-bold text-gray-700">Tú</span>
+        <div className="mt-1 ml-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-amber-200/40 bg-zinc-950/80">
+          <span className="cinema-title text-[10px] font-bold tracking-[0.08em] text-amber-100">
+            Tu
+          </span>
         </div>
       )}
     </div>

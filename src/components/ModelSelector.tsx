@@ -33,7 +33,7 @@ export function ModelSelector() {
       }}
       disabled={!activeSessionId}
     >
-      <SelectTrigger className="min-w-40 border-none bg-transparent">
+      <SelectTrigger className="min-w-40 border border-amber-100/20 bg-black/35 text-amber-100 backdrop-blur-sm hover:bg-black/50">
         <SelectValue placeholder="Selecciona un modelo" />
       </SelectTrigger>
       <SelectContent>

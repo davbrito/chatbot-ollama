@@ -26,16 +26,20 @@ export function ChatSidebar() {
   };
 
   return (
-    <aside className="flex w-72 flex-col border-r border-gray-200 bg-white">
-      <div className="flex flex-col border-b border-gray-200 p-3">
+    <aside className="flex w-20 flex-col border-r border-amber-200/15 bg-black/35 backdrop-blur-md md:w-72">
+      <div className="flex flex-col border-b border-amber-200/15 p-3">
+        <p className="cinema-title mb-2 hidden text-[10px] tracking-[0.3em] text-amber-100/70 uppercase md:block">
+          Archivo
+        </p>
         <Button
           type="button"
           onClick={handleCreateSession}
           disabled={!defaultModel}
           size="lg"
+          className="justify-center md:justify-start"
         >
           <PlusIcon className="h-4 w-4" />
-          Nuevo chat
+          <span className="hidden md:inline">Nuevo chat</span>
         </Button>
       </div>
 
@@ -88,12 +92,12 @@ function SessionItem({
     <div
       className={`group flex w-full items-center rounded-lg border text-sm transition-colors ${
         isActive
-          ? "border-indigo-100 bg-indigo-50 text-indigo-700"
-          : "border-transparent text-gray-700 hover:bg-gray-100"
+          ? "border-amber-300/40 bg-amber-300/15 text-amber-50"
+          : "border-transparent text-amber-100/75 hover:bg-amber-200/10"
       }`}
     >
       {isEditing ? (
-        <div className="flex flex-1 items-center gap-1 px-2 py-1">
+        <div className="hidden flex-1 items-center gap-1 px-2 py-1 md:flex">
           <input
             type="text"
             autoFocus
@@ -103,7 +107,7 @@ function SessionItem({
               if (e.key === "Enter") handleSave();
               if (e.key === "Escape") cancelEditing();
             }}
-            className="w-full flex-1 rounded border border-indigo-300 bg-white px-2 py-1 text-sm focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+            className="w-full flex-1 rounded border border-amber-300/40 bg-zinc-950/80 px-2 py-1 text-sm text-amber-50 focus:ring-1 focus:ring-amber-300 focus:outline-none"
           />
           <Button
             size="icon"
@@ -129,9 +133,14 @@ function SessionItem({
             onClick={onSelect}
             className="min-w-0 flex-1 px-3 py-2 text-left"
           >
-            <span className="block truncate">{title || "Nuevo chat"}</span>
+            <span className="cinema-title hidden truncate text-[11px] tracking-[0.14em] md:block">
+              {title || "Nuevo chat"}
+            </span>
+            <span className="block truncate text-center text-[11px] tracking-[0.2em] uppercase md:hidden">
+              {isActive ? "ON" : "OFF"}
+            </span>
           </button>
-          <div className="flex flex-row opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+          <div className="hidden flex-row opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 md:flex">
             <Button
               size="icon"
               variant="ghost"
@@ -140,7 +149,7 @@ function SessionItem({
                 setIsEditing(true);
                 setEditTitleValue(title);
               }}
-              className="hover:text-accent text-gray-400"
+              className="text-amber-100/40 hover:text-amber-100"
               aria-label="Renombrar chat"
               title="Renombrar"
             >
@@ -151,7 +160,7 @@ function SessionItem({
               variant="ghost"
               type="button"
               onClick={onDelete}
-              className="hover:text-destructive text-gray-400"
+              className="hover:text-destructive text-amber-100/40"
               aria-label="Eliminar chat"
               title="Eliminar chat"
             >

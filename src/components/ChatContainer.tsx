@@ -52,7 +52,7 @@ export function ChatContainer({ model }: { model: string }) {
       >
         <div className="mx-auto max-w-4xl">
           {error && (
-            <div className="sticky top-0 mb-4 flex items-start justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            <div className="sticky top-0 mb-4 flex items-start justify-between gap-3 rounded-xl border border-red-400/40 bg-red-950/40 p-3 text-sm text-red-100 backdrop-blur-sm">
               <div>
                 <strong>Error:</strong>{" "}
                 {error instanceof Error ? error.message : String(error)}
@@ -60,9 +60,8 @@ export function ChatContainer({ model }: { model: string }) {
               <Button
                 type="button"
                 onClick={() => clearError()}
-                variant="ghost"
+                variant="destructive"
                 size="icon"
-                className="shrink-0 text-red-600 hover:bg-red-100 hover:text-red-700"
                 aria-label="Cerrar error"
               >
                 <XIcon className="h-4 w-4" />
@@ -71,10 +70,12 @@ export function ChatContainer({ model }: { model: string }) {
           )}
 
           {renderMessages.length === 0 && (
-            <div className="flex h-64 flex-col items-center justify-center text-gray-400">
-              <BotMessageSquareIcon className="mb-3 h-12 w-12" />
-              <p className="text-sm font-medium">Inicia una conversación</p>
-              <p className="mt-1 text-xs">
+            <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-amber-100/10 bg-black/20 text-amber-100/70">
+              <BotMessageSquareIcon className="mb-3 h-12 w-12 text-amber-300/80" />
+              <p className="text-sm font-medium tracking-[0.18em] uppercase">
+                Cartelera en espera
+              </p>
+              <p className="mt-1 text-xs text-amber-100/55">
                 Escribe un mensaje abajo para chatear con {model}
               </p>
             </div>
@@ -103,7 +104,7 @@ export function ChatContainer({ model }: { model: string }) {
         }}
         onStop={stop}
       />
-      <div className="bg-white px-4 pb-3">
+      <div className="border-t border-amber-200/10 bg-black/25 px-4 pb-3 backdrop-blur-sm">
         <div className="mx-auto flex max-w-4xl items-center justify-end">
           <ModelSelector />
         </div>
