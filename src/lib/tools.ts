@@ -1,5 +1,6 @@
 import { evaluate } from "mathjs";
 import type { Tool, ToolCall } from "ollama/browser";
+import { getOmdbMovie, searchOmdbMovies } from "./omdb";
 import { useConfigStore } from "../store/configStore";
 
 const searchMoviesTool: Tool = {
@@ -176,13 +177,6 @@ function parseArgs<T>(args: unknown): T {
   return args as T;
 }
 
-function appendOptional(url: URL, key: string, value?: string | number) {
-  if (value === undefined || value === null) return;
-  const text = String(value).trim();
-  if (!text) return;
-  url.searchParams.set(key, text);
-}
-
 async function executeSearchMovies(args: unknown) {
   const parsedArgs = parseArgs<{
     query?: string;
@@ -204,23 +198,18 @@ async function executeSearchMovies(args: unknown) {
   }
 
   try {
-    const url = new URL("https://www.omdbapi.com/");
-    url.searchParams.set("apikey", apiKey);
-    url.searchParams.set("s", query);
-    appendOptional(url, "type", parsedArgs.type);
-    appendOptional(url, "y", parsedArgs.year);
-    appendOptional(url, "page", parsedArgs.page);
-
-    const response = await fetch(url.toString());
-    const data = await response.json();
-
-    if (data.Response === "True") {
-      return JSON.stringify(data.Search ?? []);
-    }
-
-    return JSON.stringify({ error: data.Error ?? "OMDB search failed" });
-  } catch {
-    return JSON.stringify({ error: "Failed to fetch from OMDB API" });
+    const movies = await searchOmdbMovies(apiKey, {
+      query,
+      type: parsedArgs.type,
+      year: parsedArgs.year,
+      page: parsedArgs.page,
+    });
+    return JSON.stringify(movies);
+  } catch (err) {
+    return JSON.stringify({
+      error:
+        err instanceof Error ? err.message : "Failed to fetch from OMDB API",
+    });
   }
 }
 
@@ -249,28 +238,19 @@ async function executeGetMovie(args: unknown) {
   }
 
   try {
-    const url = new URL("https://www.omdbapi.com/");
-    url.searchParams.set("apikey", apiKey);
-    if (imdbId) {
-      url.searchParams.set("i", imdbId);
-    } else if (title) {
-      url.searchParams.set("t", title);
-    }
-
-    appendOptional(url, "type", parsedArgs.type);
-    appendOptional(url, "y", parsedArgs.year);
-    appendOptional(url, "plot", parsedArgs.plot);
-
-    const response = await fetch(url.toString());
-    const data = await response.json();
-
-    if (data.Response === "True") {
-      return JSON.stringify(data);
-    }
-
-    return JSON.stringify({ error: data.Error ?? "OMDB lookup failed" });
-  } catch {
-    return JSON.stringify({ error: "Failed to fetch from OMDB API" });
+    const movie = await getOmdbMovie(apiKey, {
+      imdbId,
+      title,
+      type: parsedArgs.type,
+      year: parsedArgs.year,
+      plot: parsedArgs.plot,
+    });
+    return JSON.stringify(movie);
+  } catch (err) {
+    return JSON.stringify({
+      error:
+        err instanceof Error ? err.message : "Failed to fetch from OMDB API",
+    });
   }
 }
 

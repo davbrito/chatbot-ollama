@@ -19,6 +19,7 @@ import {
   stop as ttsStop,
 } from "../lib/tts";
 import type { CustomMessage } from "../store/chatStore";
+import { MovieTag } from "./MovieTag";
 import { Button } from "./ui/button";
 
 interface ChatMessageProps {
@@ -73,7 +74,7 @@ export const ChatMessage = memo(function ChatMessage({
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}>
       {!isUser && (
-        <div className="mt-1 mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-amber-300/50 bg-gradient-to-br from-amber-200 to-orange-500">
+        <div className="mt-1 mr-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-amber-300/50 bg-linear-to-br from-amber-200 to-orange-500">
           <span className="cinema-title text-[10px] font-bold tracking-[0.12em] text-zinc-900">
             AI
           </span>
@@ -82,7 +83,7 @@ export const ChatMessage = memo(function ChatMessage({
       <div
         className={`max-w-full rounded-2xl px-4 py-3 shadow-sm ${
           isUser
-            ? "rounded-tr-sm border border-blue-200/35 bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-[0_10px_30px_rgba(30,64,175,0.35)]"
+            ? "rounded-tr-sm border border-blue-200/35 bg-linear-to-br from-blue-600 to-indigo-700 text-white shadow-[0_10px_30px_rgba(30,64,175,0.35)]"
             : "rounded-tl-sm border border-amber-100/15 bg-zinc-900/90 text-amber-50"
         }`}
       >
@@ -120,9 +121,14 @@ export const ChatMessage = memo(function ChatMessage({
             <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:300ms]" />
           </div>
         ) : isUser ? (
-          <p className="whitespace-pre-wrap text-white">{textContent}</p>
+          <>
+            {message.movie && (
+              <MovieTag movie={message.movie} className="mb-2" />
+            )}
+            <p className="whitespace-pre-wrap text-white">{textContent}</p>
+          </>
         ) : (
-          <div className="prose prose-sm prose-invert max-w-none [&_*]:text-amber-50">
+          <div className="prose prose-sm prose-invert max-w-none **:text-amber-50">
             <Markdown
               remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeHighlight, rehypeKatex]}

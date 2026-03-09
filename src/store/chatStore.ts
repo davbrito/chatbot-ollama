@@ -5,7 +5,18 @@ import { persist } from "zustand/middleware";
 import { listModels } from "../lib/ollama";
 import { useConfigStore } from "./configStore";
 
-export type CustomMessage = Message & { id: string; createdAt?: number };
+export interface MovieAttachment {
+  title: string;
+  year: string;
+  imdbId: string;
+  poster?: string;
+}
+
+export type CustomMessage = Message & {
+  id: string;
+  createdAt?: number;
+  movie?: MovieAttachment;
+};
 
 interface ChatState {
   models: ModelResponse[];

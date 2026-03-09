@@ -1,8 +1,12 @@
 import { produce, type WritableDraft } from "immer";
 import throttle from "lodash-es/throttle";
-import type { ToolCall } from "ollama/browser";
+import type { Message, ToolCall } from "ollama/browser";
 import { useRef, useState } from "react";
-import { useChatStore, type CustomMessage } from "../store/chatStore";
+import {
+  useChatStore,
+  type CustomMessage,
+  type MovieAttachment,
+} from "../store/chatStore";
 import { useConfigStore } from "../store/configStore";
 import { buildSystemPrompts, sendChat } from "./ollama";
 import { callTool } from "./tools";
@@ -82,7 +86,43 @@ export function useChat({
     setError(null);
   };
 
-  const sendMessage = async (text: string) => {
+  const toModelMessages = (messages: CustomMessage[]): Message[] => {
+    const result: Message[] = [];
+
+    for (const message of messages) {
+      if (message.role === "user" && message.movie) {
+        result.push({
+          role: "system",
+          content: `Contexto de pelicula seleccionada por el usuario: ${JSON.stringify(message.movie)}. Usa esta pelicula como contexto principal de la conversacion si aplica.`,
+        });
+      }
+
+      if (message.role === "tool") {
+        result.push({
+          role: "tool",
+          tool_name: message.tool_name,
+          content: message.content,
+        });
+        continue;
+      }
+
+      if (message.role === "assistant") {
+        result.push({
+          role: "assistant",
+          content: message.content,
+          thinking: message.thinking,
+          tool_calls: message.tool_calls,
+        });
+        continue;
+      }
+
+      result.push({ role: message.role, content: message.content });
+    }
+
+    return result;
+  };
+
+  const sendMessage = async (text: string, movie?: MovieAttachment) => {
     if (!text.trim() || isLoading) return;
 
     setIsLoading(true);
@@ -94,6 +134,7 @@ export function useChat({
       id: crypto.randomUUID(),
       role: "user",
       content: text,
+      movie,
     };
 
     const assistantMessageInit: CustomMessage = {
@@ -114,7 +155,7 @@ export function useChat({
       const favoriteGenres = useConfigStore.getState().getFavoriteGenres();
       const currentMessages = [
         ...buildSystemPrompts(favoriteGenres),
-        ...getMessages().slice(0, -1),
+        ...toModelMessages(getMessages().slice(0, -1)),
       ];
 
       const handleToolCalls = async (calls: ToolCall[]) => {

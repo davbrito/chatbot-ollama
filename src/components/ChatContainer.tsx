@@ -24,7 +24,9 @@ export function ChatContainer({ model }: { model: string }) {
     });
   const conainerRef = useRef<HTMLDivElement>(null);
 
-  const renderMessages = messages.filter((message) => message.role !== "tool");
+  const renderMessages = messages.filter(
+    (message) => message.role !== "tool" && message.role !== "system",
+  );
   const messageCount = renderMessages;
 
   useEffect(() => {
@@ -96,15 +98,15 @@ export function ChatContainer({ model }: { model: string }) {
       <ChatInput
         model={model}
         isLoading={isLoading}
-        onSend={(text) => {
-          sendMessage(text);
+        onSend={(text, movie) => {
+          sendMessage(text, movie);
           if (!activeSessionHasTitle && activeSessionId) {
             updateSessionTitle(activeSessionId, text);
           }
         }}
         onStop={stop}
       />
-      <div className="border-t border-amber-200/10 bg-black/25 px-4 pb-3 backdrop-blur-sm">
+      <div className="border-t border-amber-200/10 bg-black/25 px-4 py-3 backdrop-blur-sm">
         <div className="mx-auto flex max-w-4xl items-center justify-end">
           <ModelSelector />
         </div>

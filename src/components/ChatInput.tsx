@@ -1,9 +1,14 @@
+import { SendHorizontalIcon, SquareIcon } from "lucide-react";
 import { useState, type KeyboardEvent } from "react";
+import type { MovieAttachment } from "../store/chatStore";
+import { MovieTag } from "./MovieTag";
+import { MoviePickerDialog } from "./MoviePickerDialog";
+import { Textarea } from "./ui/textarea";
 
 interface ChatInputProps {
   model: string;
   isLoading: boolean;
-  onSend: (content: string) => void;
+  onSend: (content: string, movie?: MovieAttachment) => void;
   onStop: () => void;
 }
 
@@ -14,11 +19,13 @@ export function ChatInput({
   onStop,
 }: ChatInputProps) {
   const [input, setInput] = useState("");
+  const [selectedMovie, setSelectedMovie] = useState<MovieAttachment>();
 
   const handleSend = () => {
     if (!input.trim() || !model) return;
-    onSend(input);
+    onSend(input, selectedMovie);
     setInput("");
+    setSelectedMovie(undefined);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -29,53 +36,57 @@ export function ChatInput({
   };
 
   return (
-    <div className="border-t border-amber-200/10 bg-gradient-to-t from-black/45 to-black/10 px-4 py-3">
-      <div className="mx-auto flex max-w-4xl items-end gap-2">
-        <textarea
-          className="field-sizing-content max-h-40 min-h-11 flex-1 resize-none rounded-xl border border-amber-200/20 bg-zinc-950/80 px-4 py-2.5 text-sm leading-relaxed text-amber-50 placeholder:text-amber-100/40 focus:border-transparent focus:ring-2 focus:ring-amber-300 focus:outline-none"
-          placeholder={
-            model
-              ? "Escribe un mensaje… (Enter para enviar, Shift+Enter para salto de línea)"
-              : "Primero selecciona un modelo"
-          }
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          rows={1}
-          disabled={!model}
-        />
-        {isLoading ? (
-          <button
-            onClick={onStop}
-            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-red-300/20 bg-red-900/80 text-red-100 transition-colors hover:bg-red-800"
-            aria-label="Detener"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="h-4 w-4"
-            >
-              <rect x="6" y="6" width="12" height="12" rx="2" />
-            </svg>
-          </button>
-        ) : (
-          <button
-            onClick={handleSend}
-            disabled={!input.trim() || !model}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-amber-100/30 bg-linear-to-br from-amber-300 to-orange-600 text-zinc-950 transition-colors enabled:hover:from-amber-200 enabled:hover:to-orange-500 disabled:cursor-not-allowed disabled:border-zinc-700 disabled:bg-zinc-700 disabled:opacity-50"
-            aria-label="Enviar"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="h-4 w-4"
-            >
-              <path d="M3.478 2.405a.75.75 0 0 0-.926.94l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.405Z" />
-            </svg>
-          </button>
+    <div className="border-t border-amber-200/10 bg-linear-to-t from-black/45 to-black/10 px-4 py-3">
+      <div className="mx-auto max-w-4xl">
+        {selectedMovie && (
+          <MovieTag
+            movie={selectedMovie}
+            variant="input"
+            className="mb-2"
+            onRemove={() => setSelectedMovie(undefined)}
+          />
         )}
+
+        <div className="flex items-center gap-2">
+          <MoviePickerDialog
+            disabled={!model}
+            onPickMovie={(movie) => {
+              setSelectedMovie(movie);
+            }}
+          />
+
+          <Textarea
+            className="field-sizing-content max-h-40 min-h-11 flex-1 resize-none rounded-xl px-4 py-2.5 leading-relaxed"
+            placeholder={
+              model
+                ? "Escribe un mensaje… (Enter para enviar, Shift+Enter para salto de línea)"
+                : "Primero selecciona un modelo"
+            }
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            rows={1}
+            disabled={!model}
+          />
+          {isLoading ? (
+            <button
+              onClick={onStop}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-300/20 bg-red-900/80 text-red-100 transition-colors hover:bg-red-800"
+              aria-label="Detener"
+            >
+              <SquareIcon className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              onClick={handleSend}
+              disabled={!input.trim() || !model}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-amber-100/30 bg-linear-to-br from-amber-300 to-orange-600 text-zinc-950 transition-colors enabled:hover:from-amber-200 enabled:hover:to-orange-500 disabled:cursor-not-allowed disabled:border-zinc-700 disabled:bg-zinc-700 disabled:opacity-50"
+              aria-label="Enviar"
+            >
+              <SendHorizontalIcon className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
