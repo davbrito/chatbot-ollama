@@ -7,15 +7,19 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
     "@elevenlabs/elevenlabs-js": "^2.38.0",
     "@fontsource-variable/inter": "^5.2.8",
+    "@hono/node-server": "^1.19.11",
     "@tailwindcss/vite": "^4.2.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.3.1",
+    "hono": "^4.12.5",
     "immer": "^11.1.4",
     "lodash-es": "^4.17.23",
     "lucide-react": "^0.577.0",
