@@ -1,9 +1,11 @@
 import { ClapperboardIcon, LoaderCircleIcon, SearchIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { searchOmdbMovies, type OmdbMovieSummary } from "../lib/omdb";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { searchOmdbMovies } from "../lib/omdb";
 import type { MovieAttachment } from "../store/chatStore";
 import useConfigStore from "../store/configStore";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import {
   Popover,
   PopoverContent,
@@ -12,7 +14,6 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "./ui/popover";
-import { Input } from "./ui/input";
 
 interface MoviePickerDialogProps {
   disabled?: boolean;
@@ -26,71 +27,55 @@ export function MoviePickerDialog({
   const [open, setOpen] = useState(false);
   const omdbApiKey = useConfigStore((state) => state.omdbApiKey);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<OmdbMovieSummary[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const canSearch = useMemo(
-    () => Boolean(omdbApiKey.trim()) && query.trim().length >= 2,
-    [omdbApiKey, query],
-  );
+  const [debouncedQuery, setDebouncedQuery] = useState("");
 
   useEffect(() => {
-    if (!open) {
-      setQuery("");
-      setResults([]);
-      setError(null);
-      setIsLoading(false);
-      return;
-    }
-
-    if (!omdbApiKey.trim()) {
-      setResults([]);
-      setError("Configura tu OMDb API Key en el tab Integraciones.");
-      return;
-    }
-
-    if (query.trim().length < 2) {
-      setResults([]);
-      setError(null);
-      return;
-    }
-
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const movies = await searchOmdbMovies(omdbApiKey, {
-          query,
-          type: "movie",
-          page: 1,
-          signal: controller.signal,
-        });
-
-        setResults(movies);
-      } catch (err) {
-        if ((err as Error).name === "AbortError") return;
-        setResults([]);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Error consultando la API de peliculas",
-        );
-      } finally {
-        setIsLoading(false);
-      }
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedQuery(query.trim());
     }, 350);
 
     return () => {
-      controller.abort();
       window.clearTimeout(timeoutId);
     };
-  }, [open, omdbApiKey, query]);
+  }, [query]);
+
+  const canSearch =
+    open && Boolean(omdbApiKey.trim()) && debouncedQuery.length >= 2;
+
+  const { data, error, isLoading } = useSWR(
+    canSearch ? ["movie-search", omdbApiKey.trim(), debouncedQuery] : null,
+    async ([, apiKey, title]: [string, string, string]) => {
+      return searchOmdbMovies(apiKey, {
+        query: title,
+        type: "movie",
+        page: 1,
+      });
+    },
+    {
+      revalidateOnFocus: false,
+      keepPreviousData: true,
+    },
+  );
+
+  const results = data ?? [];
+  const errorMessage =
+    error instanceof Error
+      ? error.message
+      : error
+        ? "Error consultando la API de peliculas"
+        : null;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) {
+          setQuery("");
+          setDebouncedQuery("");
+        }
+      }}
+    >
       <PopoverTrigger
         render={
           <button
@@ -141,16 +126,16 @@ export function MoviePickerDialog({
               </div>
             )}
 
-            {!isLoading && error && (
+            {!isLoading && errorMessage && (
               <p className="rounded-md border border-red-400/40 bg-red-950/30 p-2 text-xs text-red-100">
-                {error}
+                {errorMessage}
               </p>
             )}
 
             {!isLoading &&
-              !error &&
+              !errorMessage &&
               results.length === 0 &&
-              query.trim().length >= 2 && (
+              debouncedQuery.length >= 2 && (
                 <p className="border-foreground/10 text-muted-foreground rounded-md border bg-black/20 p-2 text-xs">
                   No hay coincidencias para esa busqueda.
                 </p>
