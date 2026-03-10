@@ -1,21 +1,16 @@
 import { Hono } from "hono";
 import { proxy } from "hono/proxy";
+import type { AppEnv } from "./config";
+import { turnstileMiddleware } from "./turnstile";
 
-const app = new Hono<{
-  Bindings: {
-    OLLAMA_URL?: string;
-    OLLAMA_API_KEY: string;
-  };
-}>();
+const app = new Hono<AppEnv>();
 
-// 1. Proxy nativo hacia la API de Ollama
+app.use("/api/*", turnstileMiddleware);
 app.all("/api/*", async (c) => {
-  // Extraemos la ruta solicitada (ej: /api/chat)
   const url = new URL(c.req.url);
 
   const OLLAMA_API_URL = c.env.OLLAMA_URL || "https://ollama.com";
   const OLLAMA_API_KEY = c.env.OLLAMA_API_KEY;
-
   const targetUrl = `${OLLAMA_API_URL}${url.pathname}${url.search}${url.hash}`;
 
   const request = new Request(c.req.raw);

@@ -36,7 +36,7 @@ export interface ChatSession {
 }
 
 interface ChatActions {
-  fetchModels: () => Promise<void>;
+  fetchModels: () => Promise<ModelResponse[]>;
   ensureActiveSession: () => string | null;
   createSession: (model: string) => string;
   deleteSession: (sessionId: string) => void;
@@ -88,6 +88,7 @@ export const useChatStore = create<ChatStateStore>()(
           const models = await listModels();
           models.sort((a, b) => a.name.localeCompare(b.name));
           set({ models, error: null });
+          return models;
         } catch (err) {
           set({
             error:
@@ -95,6 +96,7 @@ export const useChatStore = create<ChatStateStore>()(
                 ? err.message
                 : "No se pudieron obtener los modelos",
           });
+          return [];
         }
       },
 

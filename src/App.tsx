@@ -3,8 +3,10 @@ import { useEffect } from "react";
 import { ChatContainer } from "./components/ChatContainer";
 import { ChatSidebar } from "./components/ChatSidebar";
 import { GenreOnboarding } from "./components/GenreOnboarding";
+import { TurnstileInvisible } from "./components/TurnstileInvisible";
 import { useChatStore } from "./store/chatStore";
 import { useConfigStore } from "./store/configStore";
+import useSWR from "swr";
 
 export default function App() {
   const activeSessionId = useChatStore((state) => state.activeSessionId);
@@ -13,7 +15,6 @@ export default function App() {
   const ensureActiveSession = useChatStore(
     (state) => state.ensureActiveSession,
   );
-  const models = useChatStore((state) => state.models);
   const favoriteGenres = useConfigStore((state) => state.favoriteGenres);
   const setFavoriteGenres = useConfigStore((state) => state.setFavoriteGenres);
 
@@ -23,9 +24,12 @@ export default function App() {
       : undefined,
   );
 
-  useEffect(() => {
-    fetchModels();
-  }, [fetchModels]);
+  const query = useSWR("ollama:models", async () => fetchModels(), {
+    suspense: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+  const models = query.data;
 
   useEffect(() => {
     ensureActiveSession();
@@ -35,6 +39,8 @@ export default function App() {
 
   return (
     <div className="cinema-surface isolate flex h-full flex-col overflow-hidden">
+      <TurnstileInvisible />
+
       {modelsError && (
         <div className="border-b border-red-400/40 bg-red-950/40 p-3 text-center text-sm text-red-100 backdrop-blur-md">
           <strong>Error:</strong> {modelsError}
@@ -47,7 +53,7 @@ export default function App() {
             setFavoriteGenres(genres);
           }}
         />
-      ) : models.length === 0 && !modelsError ? (
+      ) : !models?.length && !modelsError ? (
         <div className="relative flex flex-1 flex-col items-center justify-center text-amber-100/80">
           <div className="marquee-pulse pointer-events-none absolute inset-x-12 top-24 h-px bg-linear-to-r from-transparent via-amber-300/70 to-transparent" />
           <ClapperboardIcon className="mb-3 h-12 w-12 animate-bounce text-amber-300" />

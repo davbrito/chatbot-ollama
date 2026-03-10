@@ -2,6 +2,7 @@ import type { Message, ModelResponse } from "ollama/browser";
 import { Ollama as OllamaClient } from "ollama/browser";
 import systemPromptText from "../assets/SYSTEM_PROMPT.md?raw";
 import { getTools } from "./tools";
+import { getTurnstileToken } from "./turnstile";
 
 const BASE_SYSTEM_PROMPTS: Message[] = [
   { role: "system", content: systemPromptText },
@@ -25,6 +26,19 @@ export function buildSystemPrompts(favoriteGenres: string[]): Message[] {
 
 export const ollama = new OllamaClient({
   host: window.location.origin,
+  fetch: async (input, init) => {
+    const token = await getTurnstileToken();
+    const headers = new Headers(init?.headers);
+
+    if (token) {
+      headers.set("CF-Turnstile-Token", token);
+    }
+
+    return fetch(input, {
+      ...init,
+      headers,
+    });
+  },
   headers: {
     "X-Github-Token": import.meta.env.GITHUB_TOKEN,
   },

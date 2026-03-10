@@ -39,6 +39,17 @@ cp .env.example .env
 | Variable          | Default                      | Description          |
 | ----------------- | ---------------------------- | -------------------- |
 | `VITE_OLLAMA_URL` | `http://localhost:11434`     | Ollama API base URL  |
+| `VITE_TURNSTILE_SITE_KEY` | (empty)              | Cloudflare Turnstile site key (frontend) |
+| `TURNSTILE_SECRET_KEY` | (empty)                 | Cloudflare Turnstile secret key (worker) |
+
+If `TURNSTILE_SECRET_KEY` is configured, all `/api/*` requests are protected with invisible Turnstile verification.
+
+## Turnstile (Invisible)
+
+1. Create a Turnstile widget in Cloudflare and set mode to `Managed` or `Invisible`.
+2. Add the site key to `VITE_TURNSTILE_SITE_KEY`.
+3. Add the secret key to `TURNSTILE_SECRET_KEY`.
+4. Run the app normally (`npm run dev` or deploy). Chat requests are verified server-side in the Cloudflare worker.
 
 ## Scripts
 
