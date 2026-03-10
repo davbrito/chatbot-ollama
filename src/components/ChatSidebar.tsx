@@ -2,15 +2,19 @@ import {
   CheckIcon,
   Edit2Icon,
   PlusIcon,
+  SettingsIcon,
   Trash2Icon,
   XIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { useChatStore } from "../store/chatStore";
+import { SettingsDialog } from "./SettingsDialog";
 import { Button } from "./ui/button";
 import {
   Sidebar,
   SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -27,15 +31,6 @@ export function ChatSidebar() {
   const handleCreateSession = () => {
     setActiveSession(null);
   };
-  /* 
-    <Sidebar>
-      <SidebarHeader />
-      <SidebarContent>
-        <SidebarGroup />
-        <SidebarGroup />
-      </SidebarContent>
-      <SidebarFooter />
-    </Sidebar> */
   return (
     <Sidebar>
       <SidebarHeader className="flex flex-col border-b border-amber-200/15 p-3">
@@ -68,6 +63,21 @@ export function ChatSidebar() {
             );
           })}
         </SidebarMenu>
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SettingsDialog
+                  trigger={
+                    <SidebarMenuButton>
+                      <SettingsIcon /> Configuración
+                    </SidebarMenuButton>
+                  }
+                ></SettingsDialog>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
@@ -104,7 +114,7 @@ function SessionItem({
     <SidebarMenuItem>
       <SidebarMenuButton
         isActive={isActive}
-        className={`group flex border transition-colors ${
+        className={`group flex border pr-0.5 transition-colors ${
           isActive
             ? "border-amber-300/40 text-amber-50"
             : "border-transparent text-amber-100/75 hover:bg-amber-200/10"

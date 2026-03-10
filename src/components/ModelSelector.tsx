@@ -8,19 +8,13 @@ import {
   SelectValue,
 } from "./ui/select";
 
-export function ModelSelector() {
-  const activeModel = useChatStore((state) =>
-    state.activeSessionId
-      ? state.sessionsById[state.activeSessionId]?.model
-      : undefined,
-  );
+export function ModelSelector({ model }: { model: string }) {
   const models = useChatStore((state) => state.models);
   const activeSessionId = useChatStore((state) => state.activeSessionId);
   const setActiveSessionModel = useChatStore(
     (state) => state.setActiveSessionModel,
   );
   const setDefaultModel = useConfigStore((s) => s.setDefaultModel);
-  const model = activeModel ?? "";
 
   if (models.length === 0) return null;
 
@@ -28,8 +22,9 @@ export function ModelSelector() {
     <Select
       value={model}
       onValueChange={(value) => {
-        setActiveSessionModel(value!);
-        setDefaultModel(value!);
+        if (!value) return;
+        setActiveSessionModel(value);
+        setDefaultModel(value);
       }}
       disabled={!activeSessionId}
     >

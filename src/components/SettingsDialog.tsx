@@ -1,4 +1,3 @@
-import { SettingsIcon } from "lucide-react";
 import { GENRE_OPTIONS } from "../lib/genres";
 import useConfigStore from "../store/configStore";
 import { PasswordInput } from "./PasswordInput";
@@ -23,7 +22,7 @@ import {
 } from "./ui/field";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
-export function SettingsDialog() {
+export function SettingsDialog({ trigger }: { trigger: React.ReactElement }) {
   const omdbApiKey = useConfigStore((s) => s.omdbApiKey);
   const setOmdbApiKey = useConfigStore((s) => s.setOmdbApiKey);
   const favoriteGenres = useConfigStore((s) => s.favoriteGenres);
@@ -42,17 +41,7 @@ export function SettingsDialog() {
 
   return (
     <Dialog>
-      <DialogTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Abrir configuracion"
-          />
-        }
-      >
-        <SettingsIcon />
-      </DialogTrigger>
+      <DialogTrigger render={trigger} />
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Configuracion</DialogTitle>

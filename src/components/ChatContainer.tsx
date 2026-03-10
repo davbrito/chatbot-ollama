@@ -44,10 +44,10 @@ export function ChatContainer({ model }: { model: string }) {
       <ChatHeader hasMessages={messages.length > 0} onClear={handleClear} />
 
       <main
-        className="min-h-0 flex-1 overflow-auto px-4 py-6"
+        className="flex min-h-0 flex-1 flex-col overflow-auto px-4 py-6"
         ref={conainerRef}
       >
-        <div className="mx-auto max-w-4xl">
+        <div className="m-auto max-w-4xl">
           {error && (
             <div className="sticky top-0 mb-4 flex items-start justify-between gap-3 rounded-xl border border-red-400/40 bg-red-950/40 p-3 text-sm text-red-100 backdrop-blur-sm">
               <div>
@@ -67,7 +67,7 @@ export function ChatContainer({ model }: { model: string }) {
           )}
 
           {renderMessages.length === 0 && (
-            <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-amber-100/10 bg-black/20 text-amber-100/70">
+            <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-amber-100/10 bg-black/20 p-4 text-center text-amber-100/70">
               <BotMessageSquareIcon className="mb-3 h-12 w-12 text-amber-300/80" />
               <p className="text-sm font-medium tracking-[0.18em] uppercase">
                 Cartelera en espera
@@ -100,7 +100,7 @@ export function ChatContainer({ model }: { model: string }) {
       />
       <div className="border-t border-amber-200/10 bg-black/25 px-4 py-3 backdrop-blur-sm">
         <div className="mx-auto flex max-w-4xl items-center justify-end">
-          <ModelSelector />
+          <ModelSelector model={model} />
         </div>
       </div>
     </div>
