@@ -11,11 +11,6 @@ import { Button } from "./ui/button";
 export function ChatContainer({ model }: { model: string }) {
   const activeSessionId = useChatStore((state) => state.activeSessionId);
   const clearActiveSession = useChatStore((state) => state.clearActiveSession);
-  const updateSessionTitle = useChatStore((state) => state.setSessionTitle);
-  const activeSessionHasTitle = useChatStore((state) => {
-    const sess = activeSessionId ? state.sessionsById[activeSessionId] : null;
-    return sess?.title;
-  });
 
   const { messages, sendMessage, stop, isLoading, error, clear, clearError } =
     useChat({
@@ -100,9 +95,6 @@ export function ChatContainer({ model }: { model: string }) {
         isLoading={isLoading}
         onSend={(text, movie) => {
           sendMessage(text, movie);
-          if (!activeSessionHasTitle && activeSessionId) {
-            updateSessionTitle(activeSessionId, text);
-          }
         }}
         onStop={stop}
       />

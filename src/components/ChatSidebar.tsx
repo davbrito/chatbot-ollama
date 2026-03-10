@@ -13,16 +13,12 @@ import { Button } from "./ui/button";
 export function ChatSidebar() {
   const sessionOrder = useChatStore((state) => state.sessionOrder);
   const activeSessionId = useChatStore((state) => state.activeSessionId);
-  const createSession = useChatStore((state) => state.createSession);
   const deleteSession = useChatStore((state) => state.deleteSession);
   const setActiveSession = useChatStore((state) => state.setActiveSession);
   const setSessionTitle = useChatStore((state) => state.setSessionTitle);
 
-  const defaultModel = useConfigStore((s) => s.getDefaultModel());
-
   const handleCreateSession = () => {
-    if (!defaultModel) return;
-    createSession(defaultModel);
+    setActiveSession(null);
   };
 
   return (
@@ -34,7 +30,6 @@ export function ChatSidebar() {
         <Button
           type="button"
           onClick={handleCreateSession}
-          disabled={!defaultModel}
           size="lg"
           className="justify-center md:justify-start"
         >

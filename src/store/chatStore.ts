@@ -40,7 +40,7 @@ interface ChatActions {
   ensureActiveSession: () => string | null;
   createSession: (model: string) => string;
   deleteSession: (sessionId: string) => void;
-  setActiveSession: (sessionId: string) => void;
+  setActiveSession: (sessionId: string | null) => void;
   setActiveSessionModel: (model: string) => void;
   clearActiveSession: () => void;
   updateSessionTitle(sessionId: string, sampleText: string): void;

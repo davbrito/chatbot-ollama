@@ -27,14 +27,22 @@ export function useChat({
   const [error, setError] = useState<Error | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  const getResolvedSessionId = (candidate?: string | null) => {
+    if (candidate) return candidate;
+    return useChatStore.getState().activeSessionId;
+  };
+
   const updateMessage = (
+    targetSessionId: string | null | undefined,
     messageId: string,
     updater: (prev: WritableDraft<CustomMessage>) => void,
   ) => {
-    if (!sessionId) return;
+    const resolvedSessionId = getResolvedSessionId(targetSessionId);
+    if (!resolvedSessionId) return;
+
     useChatStore.setState((state) =>
       produce(state, (state) => {
-        const session = state.sessionsById[sessionId];
+        const session = state.sessionsById[resolvedSessionId];
         if (!session) return;
         const message = session.messages.find((msg) => msg.id === messageId);
         if (!message) return;
@@ -44,12 +52,15 @@ export function useChat({
   };
 
   const setMessages = (
+    targetSessionId: string | null | undefined,
     updater: (prev: WritableDraft<CustomMessage>[]) => void,
   ) => {
-    if (!sessionId) return;
+    const resolvedSessionId = getResolvedSessionId(targetSessionId);
+    if (!resolvedSessionId) return;
+
     useChatStore.setState((state) =>
       produce(state, (state) => {
-        const session = state.sessionsById[sessionId];
+        const session = state.sessionsById[resolvedSessionId];
         if (!session) return;
         updater(session.messages);
         session.updatedAt = Date.now();
@@ -60,9 +71,12 @@ export function useChat({
     );
   };
 
-  const getMessages = () => {
-    if (!sessionId) return [];
-    const session = useChatStore.getState().sessionsById[sessionId];
+  const getMessages = (targetSessionId?: string | null) => {
+    const resolvedSessionId = getResolvedSessionId(
+      targetSessionId ?? sessionId,
+    );
+    if (!resolvedSessionId) return [];
+    const session = useChatStore.getState().sessionsById[resolvedSessionId];
     return session?.messages ?? [];
   };
 
@@ -75,7 +89,7 @@ export function useChat({
   };
 
   const clear = () => {
-    setMessages((m) => {
+    setMessages(sessionId, (m) => {
       m.length = 0;
     });
     stop();
@@ -125,6 +139,13 @@ export function useChat({
   const sendMessage = async (text: string, movie?: MovieAttachment) => {
     if (!text.trim() || isLoading) return;
 
+    let targetSessionId = sessionId;
+    if (!targetSessionId) {
+      targetSessionId = useChatStore.getState().createSession(model);
+    }
+
+    if (!targetSessionId) return;
+
     setIsLoading(true);
     setError(null);
 
@@ -146,16 +167,18 @@ export function useChat({
     userMessage.createdAt = now;
     assistantMessageInit.createdAt = now;
 
-    setMessages((mssgs) => {
+    setMessages(targetSessionId, (mssgs) => {
       mssgs.push(userMessage, assistantMessageInit);
     });
+
+    useChatStore.getState().updateSessionTitle(targetSessionId, text);
 
     try {
       // System prompt from lib/ollama.ts
       const favoriteGenres = useConfigStore.getState().getFavoriteGenres();
       const currentMessages = [
         ...buildSystemPrompts(favoriteGenres),
-        ...toModelMessages(getMessages().slice(0, -1)),
+        ...toModelMessages(getMessages(targetSessionId).slice(0, -1)),
       ];
 
       const handleToolCalls = async (calls: ToolCall[]) => {
@@ -181,7 +204,7 @@ export function useChat({
 
           toolMessageInit.createdAt = Date.now();
 
-          setMessages((mssgs) => {
+          setMessages(targetSessionId, (mssgs) => {
             mssgs.push(toolMessageInit);
           });
         }
@@ -201,12 +224,16 @@ export function useChat({
         let assistantThinking = "";
 
         const update = throttle(() => {
-          updateMessage(assistantMessageInit.id, (assistantMessage) => {
-            if (assistantContent) assistantMessage.content = assistantContent;
-            if (assistantThinking)
-              assistantMessage.thinking = assistantThinking;
-            if (toolCalls.length > 0) assistantMessage.tool_calls = toolCalls;
-          });
+          updateMessage(
+            targetSessionId,
+            assistantMessageInit.id,
+            (assistantMessage) => {
+              if (assistantContent) assistantMessage.content = assistantContent;
+              if (assistantThinking)
+                assistantMessage.thinking = assistantThinking;
+              if (toolCalls.length > 0) assistantMessage.tool_calls = toolCalls;
+            },
+          );
         }, 100);
 
         for await (const part of stream) {

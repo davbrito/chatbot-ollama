@@ -1,5 +1,4 @@
 import { ClapperboardIcon } from "lucide-react";
-import { useEffect } from "react";
 import useSWR from "swr";
 import { ChatContainer } from "./components/ChatContainer";
 import { ChatSidebar } from "./components/ChatSidebar";
@@ -12,9 +11,7 @@ export default function App() {
   const activeSessionId = useChatStore((state) => state.activeSessionId);
   const modelsError = useChatStore((state) => state.error);
   const fetchModels = useChatStore((state) => state.fetchModels);
-  const ensureActiveSession = useChatStore(
-    (state) => state.ensureActiveSession,
-  );
+  const preferredModel = useConfigStore((state) => state.getDefaultModel());
   const favoriteGenres = useConfigStore((state) => state.favoriteGenres);
   const setFavoriteGenres = useConfigStore((state) => state.setFavoriteGenres);
 
@@ -31,9 +28,10 @@ export default function App() {
   });
   const models = query.data;
 
-  useEffect(() => {
-    ensureActiveSession();
-  }, [models, ensureActiveSession]);
+  const fallbackModel =
+    models?.find((model) => model.name === preferredModel)?.name ??
+    models?.[0]?.name;
+  const selectedModel = activeModel ?? fallbackModel;
 
   const shouldAskGenres = favoriteGenres.length === 0;
 
@@ -62,12 +60,12 @@ export default function App() {
             Conectando con Ollama
           </p>
         </div>
-      ) : activeModel ? (
+      ) : selectedModel ? (
         <div className="flex min-h-0 flex-1">
           <ChatSidebar />
           <ChatContainer
-            key={`${activeModel}-${activeSessionId ?? "default"}`}
-            model={activeModel}
+            key={`${selectedModel}-${activeSessionId ?? "new"}`}
+            model={selectedModel}
           />
         </div>
       ) : null}
