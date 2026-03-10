@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cache } from "hono/cache";
 import { proxy } from "hono/proxy";
 import { sessionJwtMiddleware, startSession } from "./auth";
 import type { AppEnv } from "./config";
@@ -8,6 +9,13 @@ const app = new Hono<AppEnv>();
 app.post("/api/auth/start-session", startSession);
 
 app.use("/api/*", sessionJwtMiddleware);
+app.use(
+  "/api/tags",
+  cache({
+    cacheName: "ollama:tags",
+    cacheControl: "public, max-age=3600",
+  }),
+);
 
 app.all("/api/*", async (c) => {
   const url = new URL(c.req.url);
