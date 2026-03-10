@@ -193,7 +193,7 @@ async function executeSearchMovies(args: unknown) {
   const apiKey = getOmdbApiKey();
   if (!apiKey) {
     return JSON.stringify({
-      error: "VITE_OMDB_API_KEY is not configured in env variables",
+      error: "OMDB_API_KEY is not configured in env variables",
     });
   }
 
@@ -233,7 +233,7 @@ async function executeGetMovie(args: unknown) {
   const apiKey = getOmdbApiKey();
   if (!apiKey) {
     return JSON.stringify({
-      error: "VITE_OMDB_API_KEY is not configured in env variables",
+      error: "OMDB_API_KEY is not configured in env variables",
     });
   }
 

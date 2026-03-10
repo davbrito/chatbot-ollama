@@ -26,6 +26,7 @@ export function MoviePickerDialog({
 }: MoviePickerDialogProps) {
   const [open, setOpen] = useState(false);
   const omdbApiKey = useConfigStore((state) => state.omdbApiKey);
+  const effectiveApiKey = omdbApiKey.trim() || "proxy";
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
@@ -39,11 +40,10 @@ export function MoviePickerDialog({
     };
   }, [query]);
 
-  const canSearch =
-    open && Boolean(omdbApiKey.trim()) && debouncedQuery.length >= 2;
+  const canSearch = open && debouncedQuery.length >= 2;
 
   const { data, error, isLoading } = useSWR(
-    canSearch ? ["movie-search", omdbApiKey.trim(), debouncedQuery] : null,
+    canSearch ? ["movie-search", effectiveApiKey, debouncedQuery] : null,
     async ([, apiKey, title]: [string, string, string]) => {
       return searchOmdbMovies(apiKey, {
         query: title,
@@ -145,7 +145,7 @@ export function MoviePickerDialog({
               <button
                 key={movie.imdbID}
                 type="button"
-                className="border-foreground/10 w-full rounded-md border bg-black/20 p-2 text-left transition-colors hover:border-amber-200/30 hover:bg-black/35"
+                className="border-foreground/10 flex w-full items-center gap-3 rounded-md border bg-black/20 p-2 text-left transition-colors hover:border-amber-200/30 hover:bg-black/35"
                 onClick={() => {
                   onPickMovie({
                     title: movie.Title,
@@ -159,10 +159,21 @@ export function MoviePickerDialog({
                   setOpen(false);
                 }}
               >
-                <p className="text-sm text-amber-50">{movie.Title}</p>
-                <p className="text-xs text-amber-100/70">
-                  {movie.Year} · IMDb {movie.imdbID}
-                </p>
+                <img
+                  src={
+                    movie.Poster && movie.Poster !== "N/A"
+                      ? movie.Poster
+                      : "https://placehold.co/300x450?text=No+Image"
+                  }
+                  alt={`${movie.Title} poster`}
+                  className="h-16 w-12 rounded-md object-cover"
+                />
+                <div>
+                  <p className="text-sm text-amber-50">{movie.Title}</p>
+                  <p className="text-xs text-amber-100/70">
+                    {movie.Year} · IMDb {movie.imdbID}
+                  </p>
+                </div>
               </button>
             ))}
           </div>

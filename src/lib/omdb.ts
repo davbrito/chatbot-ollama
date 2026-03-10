@@ -26,7 +26,8 @@ function appendOptional(url: URL, key: string, value?: string | number) {
 }
 
 function assertApiKey(apiKey: string) {
-  if (!apiKey.trim()) {
+  // If the apiKey is "proxy", we are using the server-side proxy
+  if (apiKey !== "proxy" && !apiKey.trim()) {
     throw new Error("OMDb API key is required");
   }
 }
@@ -48,8 +49,15 @@ export async function searchOmdbMovies(
     throw new Error("Missing required argument: query");
   }
 
-  const url = new URL("https://www.omdbapi.com/");
-  url.searchParams.set("apikey", apiKey.trim());
+  const url =
+    apiKey === "proxy"
+      ? new URL("/api/omdb/", window.location.origin)
+      : new URL("https://www.omdbapi.com/");
+
+  if (apiKey !== "proxy") {
+    url.searchParams.set("apikey", apiKey.trim());
+  }
+
   url.searchParams.set("s", query);
   appendOptional(url, "type", params.type);
   appendOptional(url, "y", params.year);
@@ -90,8 +98,14 @@ export async function getOmdbMovie(
     throw new Error("Missing required argument: imdb_id or title");
   }
 
-  const url = new URL("https://www.omdbapi.com/");
-  url.searchParams.set("apikey", apiKey.trim());
+  const url =
+    apiKey === "proxy"
+      ? new URL("/api/omdb/", window.location.origin)
+      : new URL("https://www.omdbapi.com/");
+
+  if (apiKey !== "proxy") {
+    url.searchParams.set("apikey", apiKey.trim());
+  }
 
   if (imdbId) {
     url.searchParams.set("i", imdbId);

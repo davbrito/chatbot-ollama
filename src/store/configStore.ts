@@ -1,14 +1,13 @@
+import uniq from "lodash-es/uniq";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { setTTSProvider, type TTSProviderName } from "../lib/tts";
-import uniq from "lodash-es/uniq";
 
 const initialTtsProvider =
   (import.meta.env.VITE_TTS_PROVIDER as TTSProviderName) || "browser";
 const initialElevenlabsApiKey = import.meta.env.VITE_ELEVENLABS_API_KEY || "";
 const initialElevenlabsVoice = import.meta.env.VITE_ELEVENLABS_VOICE_ID || "";
 const initialDefaultModel = import.meta.env.VITE_DEFAULT_MODEL || "";
-const initialOmdbApiKey = import.meta.env.VITE_OMDB_API_KEY || "";
 
 interface ConfigState {
   ttsProvider: TTSProviderName;
@@ -37,7 +36,7 @@ export const useConfigStore = create<ConfigState>()(
       elevenlabsApiKey: initialElevenlabsApiKey,
       elevenlabsVoice: initialElevenlabsVoice,
       defaultModel: initialDefaultModel,
-      omdbApiKey: initialOmdbApiKey,
+      omdbApiKey: "",
       favoriteGenres: [],
       setTtsProvider: (p: TTSProviderName) => {
         setTTSProvider(p, {
@@ -66,7 +65,7 @@ export const useConfigStore = create<ConfigState>()(
         return get().defaultModel || initialDefaultModel;
       },
       getOmdbApiKey() {
-        return get().omdbApiKey || initialOmdbApiKey;
+        return get().omdbApiKey;
       },
       getFavoriteGenres() {
         return get().favoriteGenres;

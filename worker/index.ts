@@ -17,6 +17,28 @@ app.use(
   }),
 );
 
+app.get("/api/omdb/*", async (c) => {
+  const url = new URL(c.req.url);
+
+  const OMDB_API_KEY = c.env.OMDB_API_KEY;
+  if (!OMDB_API_KEY) {
+    return c.json(
+      { Response: "False", Error: "OMDb API key not configured" },
+      500,
+    );
+  }
+
+  const targetUrl = new URL("https://www.omdbapi.com/");
+  const searchParams = url.searchParams;
+  targetUrl.search = searchParams.toString();
+  targetUrl.searchParams.set("apikey", OMDB_API_KEY);
+
+  return proxy(targetUrl, {
+    method: c.req.method,
+    signal: c.req.raw.signal,
+  });
+});
+
 app.all("/api/*", async (c) => {
   const url = new URL(c.req.url);
 
