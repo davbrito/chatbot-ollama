@@ -78,10 +78,10 @@ export function MoviePickerDialog({
     >
       <PopoverTrigger
         render={
-          <button
+          <Button
             type="button"
             disabled={disabled}
-            className="flex h-10 shrink-0 items-center gap-1 rounded-xl border border-amber-100/25 bg-zinc-950/70 px-3 text-xs text-amber-100 transition-colors hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex shrink-0 items-center gap-1 border border-amber-100/25 bg-zinc-950/70 px-3 text-xs text-amber-100 transition-colors hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Seleccionar pelicula"
           />
         }
