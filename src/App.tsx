@@ -4,6 +4,7 @@ import { ChatContainer } from "./components/ChatContainer";
 import { ChatSidebar } from "./components/ChatSidebar";
 import { GenreOnboarding } from "./components/GenreOnboarding";
 import { TurnstileInvisible } from "./components/TurnstileInvisible";
+import { SidebarProvider } from "./components/ui/sidebar";
 import { useChatStore } from "./store/chatStore";
 import { useConfigStore } from "./store/configStore";
 
@@ -61,13 +62,13 @@ export default function App() {
           </p>
         </div>
       ) : selectedModel ? (
-        <div className="flex min-h-0 flex-1">
+        <SidebarProvider>
           <ChatSidebar />
           <ChatContainer
             key={`${selectedModel}-${activeSessionId ?? "new"}`}
             model={selectedModel}
           />
-        </div>
+        </SidebarProvider>
       ) : null}
     </div>
   );

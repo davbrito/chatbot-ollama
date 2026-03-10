@@ -1,5 +1,6 @@
 import { ClapperboardIcon } from "lucide-react";
 import { SettingsDialog } from "./SettingsDialog";
+import { SidebarTrigger } from "./ui/sidebar";
 
 interface ChatHeaderProps {
   hasMessages: boolean;
@@ -8,7 +9,8 @@ interface ChatHeaderProps {
 
 export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
   return (
-    <header className="z-10 flex items-center justify-between border-b border-amber-200/20 bg-linear-to-r from-black/45 via-zinc-900/55 to-black/45 px-4 py-3 shadow-[0_10px_40px_rgba(0,0,0,0.35)] backdrop-blur-md">
+    <header className="z-10 flex items-center gap-4 border-b border-amber-200/20 bg-linear-to-r from-black/45 via-zinc-900/55 to-black/45 px-4 py-3 shadow-[0_10px_40px_rgba(0,0,0,0.35)] backdrop-blur-md">
+      <SidebarTrigger />
       <div className="flex items-center gap-3">
         <div className="marquee-pulse flex h-9 w-9 items-center justify-center rounded-full border border-amber-300/70 bg-linear-to-br from-amber-200 to-orange-500 text-zinc-900 shadow-[0_0_18px_rgba(251,191,36,0.45)]">
           <ClapperboardIcon className="h-4 w-4" />
@@ -22,7 +24,7 @@ export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
           </p>
         </div>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-3">
         <SettingsDialog />
         {hasMessages && (
           <button
