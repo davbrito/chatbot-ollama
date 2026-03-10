@@ -15,7 +15,7 @@ export function ChatHeader({ hasMessages, onClear }: ChatHeaderProps) {
         </div>
         <div>
           <h1 className="cinema-title text-sm leading-tight font-semibold tracking-[0.12em] text-amber-100 uppercase">
-            Cinéfilo Michael
+            Asistente de Cine
           </h1>
           <p className="text-[11px] tracking-[0.2em] text-amber-200/70 uppercase">
             Sala privada · Ollama
