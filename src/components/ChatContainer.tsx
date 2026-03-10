@@ -8,7 +8,13 @@ import { ChatMessage } from "./ChatMessage";
 import { ModelSelector } from "./ModelSelector";
 import { Button } from "./ui/button";
 
-export function ChatContainer({ model }: { model: string }) {
+export function ChatContainer({
+  model,
+  error: errorProp,
+}: {
+  model: string;
+  error?: string | null;
+}) {
   const activeSessionId = useChatStore((state) => state.activeSessionId);
   const clearActiveSession = useChatStore((state) => state.clearActiveSession);
 
@@ -47,6 +53,11 @@ export function ChatContainer({ model }: { model: string }) {
         className="flex min-h-0 flex-1 flex-col overflow-auto px-4 py-6"
         ref={conainerRef}
       >
+        {errorProp && (
+          <div className="border-destructive/40 bg-destructive/10 rounded-lg border p-3 text-center text-sm text-red-100 backdrop-blur-md">
+            <strong>Error:</strong> {errorProp}
+          </div>
+        )}
         <div className="m-auto w-full max-w-4xl">
           {error && (
             <div className="sticky top-0 mb-4 flex items-start justify-between gap-3 rounded-xl border border-red-400/40 bg-red-950/40 p-3 text-sm text-red-100 backdrop-blur-sm">
