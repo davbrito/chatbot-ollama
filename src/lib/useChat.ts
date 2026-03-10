@@ -107,7 +107,7 @@ export function useChat({
       if (message.role === "user" && message.movie) {
         result.push({
           role: "system",
-          content: `Contexto de pelicula seleccionada por el usuario: ${JSON.stringify(message.movie)}. Usa esta pelicula como contexto principal de la conversacion si aplica.`,
+          content: `El usuario adjuntó la siguiente película a su mensaje: ${JSON.stringify(message.movie)}. Úsala para entender mejor el contexto de lo que dice el usuario a continuación.`,
         });
       }
 

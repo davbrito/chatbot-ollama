@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useChatStore } from "../store/chatStore";
-import useConfigStore from "../store/configStore";
 import { Button } from "./ui/button";
 
 export function ChatSidebar() {
