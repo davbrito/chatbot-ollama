@@ -47,7 +47,7 @@ export function ChatContainer({ model }: { model: string }) {
         className="flex min-h-0 flex-1 flex-col overflow-auto px-4 py-6"
         ref={conainerRef}
       >
-        <div className="m-auto max-w-4xl">
+        <div className="m-auto w-full max-w-4xl">
           {error && (
             <div className="sticky top-0 mb-4 flex items-start justify-between gap-3 rounded-xl border border-red-400/40 bg-red-950/40 p-3 text-sm text-red-100 backdrop-blur-sm">
               <div>
