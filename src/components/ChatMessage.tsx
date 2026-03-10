@@ -39,8 +39,7 @@ export const ChatMessage = memo(function ChatMessage({
   const textContent = message.content;
 
   const showTypingIndicator = isLastLoading && !isUser && textContent === "";
-  const isThinking =
-    isLastLoading && !isUser && textContent === "" && textThinking !== "";
+  const isThinking = isLastLoading && !isUser && textThinking !== "";
 
   const timeString = message.createdAt
     ? new Date(message.createdAt).toLocaleTimeString([], {
