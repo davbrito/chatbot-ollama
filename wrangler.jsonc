@@ -7,4 +7,10 @@
     "run_worker_first": ["/api/*"],
   },
   "main": "./worker/index.ts",
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true,
+    },
+  },
 }
