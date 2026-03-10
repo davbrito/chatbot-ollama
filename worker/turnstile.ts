@@ -1,5 +1,4 @@
 import type { Context } from "hono";
-import { createMiddleware } from "hono/factory";
 import type { AppEnv } from "./config";
 
 interface TurnstileVerifyResponse {
@@ -7,7 +6,7 @@ interface TurnstileVerifyResponse {
   "error-codes"?: string[];
 }
 
-async function verifyTurnstile(c: Context<AppEnv>) {
+export async function verifyTurnstile(c: Context<AppEnv>) {
   const secret = c.env.TURNSTILE_SECRET_KEY;
   if (!secret) {
     return null;
@@ -56,11 +55,3 @@ async function verifyTurnstile(c: Context<AppEnv>) {
 
   return null;
 }
-
-export const turnstileMiddleware = createMiddleware(async (c, next) => {
-  const errorResponse = await verifyTurnstile(c);
-  if (errorResponse) {
-    return errorResponse;
-  }
-  return next();
-});

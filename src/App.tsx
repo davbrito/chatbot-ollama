@@ -1,12 +1,12 @@
 import { ClapperboardIcon } from "lucide-react";
 import { useEffect } from "react";
+import useSWR from "swr";
 import { ChatContainer } from "./components/ChatContainer";
 import { ChatSidebar } from "./components/ChatSidebar";
 import { GenreOnboarding } from "./components/GenreOnboarding";
 import { TurnstileInvisible } from "./components/TurnstileInvisible";
 import { useChatStore } from "./store/chatStore";
 import { useConfigStore } from "./store/configStore";
-import useSWR from "swr";
 
 export default function App() {
   const activeSessionId = useChatStore((state) => state.activeSessionId);

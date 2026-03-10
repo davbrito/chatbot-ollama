@@ -1,11 +1,14 @@
 import { Hono } from "hono";
 import { proxy } from "hono/proxy";
+import { sessionJwtMiddleware, startSession } from "./auth";
 import type { AppEnv } from "./config";
-import { turnstileMiddleware } from "./turnstile";
 
 const app = new Hono<AppEnv>();
 
-app.use("/api/*", turnstileMiddleware);
+app.post("/api/auth/start-session", startSession);
+
+app.use("/api/*", sessionJwtMiddleware);
+
 app.all("/api/*", async (c) => {
   const url = new URL(c.req.url);
 

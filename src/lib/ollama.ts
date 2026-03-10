@@ -1,8 +1,8 @@
 import type { Message, ModelResponse } from "ollama/browser";
 import { Ollama as OllamaClient } from "ollama/browser";
 import systemPromptText from "../assets/SYSTEM_PROMPT.md?raw";
+import { ensureSessionCookie, resetSessionCookieState } from "./sessionAuth";
 import { getTools } from "./tools";
-import { getTurnstileToken } from "./turnstile";
 
 const BASE_SYSTEM_PROMPTS: Message[] = [
   { role: "system", content: systemPromptText },
@@ -27,20 +27,23 @@ export function buildSystemPrompts(favoriteGenres: string[]): Message[] {
 export const ollama = new OllamaClient({
   host: window.location.origin,
   fetch: async (input, init) => {
-    const token = await getTurnstileToken();
-    const headers = new Headers(init?.headers);
+    await ensureSessionCookie();
 
-    if (token) {
-      headers.set("CF-Turnstile-Token", token);
+    let response = await fetch(input, {
+      ...init,
+      credentials: "same-origin",
+    });
+
+    if (response.status === 401) {
+      resetSessionCookieState();
+      await ensureSessionCookie();
+      response = await fetch(input, {
+        ...init,
+        credentials: "same-origin",
+      });
     }
 
-    return fetch(input, {
-      ...init,
-      headers,
-    });
-  },
-  headers: {
-    "X-Github-Token": import.meta.env.GITHUB_TOKEN,
+    return response;
   },
 });
 
