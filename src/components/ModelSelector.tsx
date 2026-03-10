@@ -10,7 +10,6 @@ import {
 
 export function ModelSelector({ model }: { model: string }) {
   const models = useChatStore((state) => state.models);
-  const activeSessionId = useChatStore((state) => state.activeSessionId);
   const setActiveSessionModel = useChatStore(
     (state) => state.setActiveSessionModel,
   );
@@ -26,7 +25,6 @@ export function ModelSelector({ model }: { model: string }) {
         setActiveSessionModel(value);
         setDefaultModel(value);
       }}
-      disabled={!activeSessionId}
     >
       <SelectTrigger className="min-w-40 border border-amber-100/20 bg-black/35 text-amber-100 backdrop-blur-sm hover:bg-black/50">
         <SelectValue placeholder="Selecciona un modelo" />
