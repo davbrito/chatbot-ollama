@@ -49,7 +49,7 @@ interface ChatActions {
 
 type ChatStateStore = ChatState & ChatActions;
 
-function getSessionTitle(message: string) {
+export function getSessionTitle(message: string) {
   if (!message) return "Nuevo chat";
   if (message.length <= 40) return message;
   return `${message.slice(0, 40)}…`;

@@ -3,6 +3,7 @@ import throttle from "lodash-es/throttle";
 import type { Message, ToolCall } from "ollama/browser";
 import { useRef, useState } from "react";
 import {
+  getSessionTitle,
   useChatStore,
   type CustomMessage,
   type MovieAttachment,
@@ -67,6 +68,14 @@ export function useChat({
         state.sessionOrder = Object.values(state.sessionsById)
           .sort((a, b) => b.updatedAt - a.updatedAt)
           .map((session) => session.id);
+        if (!session.title && session.messages.length > 0) {
+          const firstUserMessage = session.messages.find(
+            (msg) => msg.role === "user" && msg.content.trim() !== "",
+          );
+          if (firstUserMessage) {
+            session.title = getSessionTitle(firstUserMessage.content);
+          }
+        }
       }),
     );
   };
@@ -170,8 +179,6 @@ export function useChat({
     setMessages(targetSessionId, (mssgs) => {
       mssgs.push(userMessage, assistantMessageInit);
     });
-
-    useChatStore.getState().updateSessionTitle(targetSessionId, text);
 
     try {
       // System prompt from lib/ollama.ts
