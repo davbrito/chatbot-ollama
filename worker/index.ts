@@ -15,13 +15,12 @@ app.use("/api/*", sessionJwtMiddleware);
 
 const ttsSchema = z.object({
   text: z.string(),
-  voice: z.string(),
-  model: z.string(),
 });
 
 app.post("/api/tts", sValidator("json", ttsSchema), async (c) => {
-  const { text, voice, model } = c.req.valid("json");
+  const { text } = c.req.valid("json");
   const ELEVEN_LABS_API_KEY = c.env.ELEVEN_LABS_API_KEY;
+  const voice = c.env.ELEVEN_LABS_VOICE_ID || "alloy";
 
   if (!ELEVEN_LABS_API_KEY) {
     return c.json({ error: "ElevenLabs API key not configured" }, 500);
@@ -32,7 +31,7 @@ app.post("/api/tts", sValidator("json", ttsSchema), async (c) => {
   try {
     const speechStream = await client.textToSpeech.convert(voice, {
       text,
-      modelId: model,
+      modelId: "eleven_flash_v2_5",
       outputFormat: "mp3_44100_128",
     });
 

@@ -45,15 +45,8 @@ class BrowserTTS implements TTSProvider {
 }
 
 class ElevenLabsTTS implements TTSProvider {
-  private voice: string;
-  private model: string;
   private audio: HTMLAudioElement | null = null;
   private speaking = false;
-
-  constructor(options: { voice: string; model: string }) {
-    this.voice = options.voice;
-    this.model = options.model;
-  }
 
   async speak(text: string) {
     // stop any existing audio
@@ -66,8 +59,6 @@ class ElevenLabsTTS implements TTSProvider {
       },
       body: JSON.stringify({
         text,
-        voice: this.voice,
-        model: this.model,
       }),
     });
 
@@ -123,17 +114,11 @@ class ElevenLabsTTS implements TTSProvider {
 const browser = new BrowserTTS();
 let active: TTSProvider = browser;
 
-export function setTTSProvider(
-  name: TTSProviderName,
-  options?: { voice?: string },
-) {
+export function setTTSProvider(name: TTSProviderName) {
   if (name === "browser") {
     active = browser;
   } else if (name === "elevenlabs") {
-    active = new ElevenLabsTTS({
-      voice: options?.voice || "alloy",
-      model: "eleven_flash_v2_5",
-    });
+    active = new ElevenLabsTTS();
   }
 }
 

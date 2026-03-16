@@ -4,6 +4,7 @@ export interface AppEnv {
     OLLAMA_API_KEY: string;
     OMDB_API_KEY: string;
     ELEVEN_LABS_API_KEY?: string;
+    ELEVEN_LABS_VOICE_ID?: string;
     TURNSTILE_SECRET_KEY?: string;
     JWT_SECRET_KEY?: string;
     SESSION_JWT_TTL_SECONDS?: string;

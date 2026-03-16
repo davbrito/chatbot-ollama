@@ -6,7 +6,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from "./ui/field";
-import { Input } from "./ui/input";
 import {
   Select,
   SelectContent,
@@ -17,9 +16,7 @@ import {
 
 export function TTSProviderSelector() {
   const provider = useConfigStore((s) => s.ttsProvider);
-  const voice = useConfigStore((s) => s.getElevenlabsVoice());
   const setProvider = useConfigStore((s) => s.setTtsProvider);
-  const setVoice = useConfigStore((s) => s.setElevenlabsVoice);
 
   return (
     <FieldGroup>
@@ -43,24 +40,6 @@ export function TTSProviderSelector() {
           </FieldDescription>
         </FieldContent>
       </Field>
-
-      {provider === "elevenlabs" && (
-        <FieldGroup>
-          <Field>
-            <FieldLabel>Voz</FieldLabel>
-            <FieldContent>
-              <Input
-                placeholder="voice (e.g. allay)"
-                value={voice}
-                onChange={(e) => setVoice(e.target.value)}
-              />
-              <FieldDescription>
-                Usa un voice ID de ElevenLabs.
-              </FieldDescription>
-            </FieldContent>
-          </Field>
-        </FieldGroup>
-      )}
     </FieldGroup>
   );
 }
