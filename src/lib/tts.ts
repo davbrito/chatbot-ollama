@@ -1,3 +1,5 @@
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
+
 export type TTSProviderName = "browser" | "elevenlabs";
 
 export interface TTSProvider {
@@ -52,22 +54,21 @@ class ElevenLabsTTS implements TTSProvider {
     // stop any existing audio
     this.stop();
 
-    const response = await fetch("/api/tts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        text,
-      }),
+    const configResponse = await fetch("/api/tts/config");
+    if (!configResponse.ok) {
+      throw new Error("Failed to fetch TTS configuration from server");
+    }
+    const { apiKey, voiceId } = await configResponse.json();
+
+    const client = new ElevenLabsClient({ apiKey });
+
+    const result = await client.textToSpeech.stream(voiceId, {
+      text,
+      modelId: "eleven_flash_v2_5",
+      outputFormat: "mp3_44100_128",
     });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.error || "Failed to generate speech");
-    }
-
-    const blob = await response.blob();
+    const blob = await new Response(result).blob();
 
     const src = URL.createObjectURL(blob);
     const audio = new Audio(src);
