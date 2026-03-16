@@ -19,14 +19,14 @@ const ttsSchema = z.object({
 
 app.post("/api/tts", sValidator("json", ttsSchema), async (c) => {
   const { text } = c.req.valid("json");
-  const ELEVEN_LABS_API_KEY = c.env.ELEVEN_LABS_API_KEY;
-  const voice = c.env.ELEVEN_LABS_VOICE_ID || "alloy";
+  const ELEVENLABS_API_KEY = c.env.ELEVENLABS_API_KEY;
+  const voice = c.env.ELEVENLABS_VOICE_ID || "alloy";
 
-  if (!ELEVEN_LABS_API_KEY) {
+  if (!ELEVENLABS_API_KEY) {
     return c.json({ error: "ElevenLabs API key not configured" }, 500);
   }
 
-  const client = new ElevenLabsClient({ apiKey: ELEVEN_LABS_API_KEY });
+  const client = new ElevenLabsClient({ apiKey: ELEVENLABS_API_KEY });
 
   try {
     const speechStream = await client.textToSpeech.convert(voice, {
