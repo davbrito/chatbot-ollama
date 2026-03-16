@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "node server.ts",
-    "typegen": "wrangler types",
+    "typegen": "wrangler types --env-file .env.example",
     "postinstall": "npm run typegen"
   },
   "dependencies": {
