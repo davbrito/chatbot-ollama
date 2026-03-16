@@ -93,7 +93,7 @@ app.all("/api/*", async (c) => {
     // log the request body for debugging
     const cloned = request.clone();
     const body = await cloned.json().catch(() => null);
-    console.log("Chat request body:", body);
+    console.log({ type: "chat_request", body });
   }
 
   return proxy(targetUrl, request);
