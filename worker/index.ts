@@ -89,6 +89,13 @@ app.all("/api/*", async (c) => {
     request.headers.set("Authorization", `Bearer ${OLLAMA_API_KEY}`);
   }
 
+  if (url.pathname === "/api/chat") {
+    // log the request body for debugging
+    const cloned = request.clone();
+    const body = await cloned.json().catch(() => null);
+    console.log("Chat request body:", body);
+  }
+
   return proxy(targetUrl, request);
 });
 
