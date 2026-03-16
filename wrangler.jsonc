@@ -17,4 +17,7 @@
       "enabled": true,
     },
   },
+  "vars": {
+    "OLLAMA_URL": "",
+  },
 }
