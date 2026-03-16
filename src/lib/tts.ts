@@ -62,10 +62,9 @@ class ElevenLabsTTS implements TTSProvider {
 
     const client = new ElevenLabsClient({ apiKey });
 
-    const result = await client.textToSpeech.stream(voiceId, {
+    const result = await client.textToSpeech.convert(voiceId, {
       text,
       modelId: "eleven_flash_v2_5",
-      outputFormat: "mp3_44100_128",
     });
 
     const blob = await new Response(result).blob();
