@@ -1,5 +1,3 @@
-import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
-
 export type TTSProviderName = "browser" | "elevenlabs";
 
 export interface TTSProvider {
@@ -47,36 +45,38 @@ class BrowserTTS implements TTSProvider {
 }
 
 class ElevenLabsTTS implements TTSProvider {
-  private apiKey: string | undefined;
   private voice: string;
   private model: string;
   private audio: HTMLAudioElement | null = null;
   private speaking = false;
 
-  constructor(options: { apiKey: string; voice: string; model: string }) {
-    this.apiKey = options.apiKey;
+  constructor(options: { voice: string; model: string }) {
     this.voice = options.voice;
     this.model = options.model;
   }
 
   async speak(text: string) {
-    if (!this.apiKey) {
-      throw new Error("ElevenLabs API key not configured");
-    }
-
     // stop any existing audio
     this.stop();
-    // Try using the official SDK (statically imported) if available, otherwise fall back to REST
 
-    const client = new ElevenLabsClient({ apiKey: this.apiKey });
-
-    const result = await client.textToSpeech.convert(this.voice, {
-      text: text,
-      modelId: this.model,
-      languageCode: "es",
+    const response = await fetch("/api/tts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text,
+        voice: this.voice,
+        model: this.model,
+      }),
     });
 
-    const blob = await new Response(result).blob();
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || "Failed to generate speech");
+    }
+
+    const blob = await response.blob();
 
     const src = URL.createObjectURL(blob);
     const audio = new Audio(src);
@@ -125,13 +125,12 @@ let active: TTSProvider = browser;
 
 export function setTTSProvider(
   name: TTSProviderName,
-  options?: { apiKey?: string; voice?: string },
+  options?: { voice?: string },
 ) {
   if (name === "browser") {
     active = browser;
   } else if (name === "elevenlabs") {
     active = new ElevenLabsTTS({
-      apiKey: options?.apiKey ?? "",
       voice: options?.voice || "alloy",
       model: "eleven_flash_v2_5",
     });

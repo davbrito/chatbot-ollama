@@ -1,5 +1,4 @@
 import useConfigStore from "../store/configStore";
-import { Input } from "./ui/input";
 import {
   Field,
   FieldContent,
@@ -7,7 +6,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "./ui/field";
-import { PasswordInput } from "./PasswordInput";
+import { Input } from "./ui/input";
 import {
   Select,
   SelectContent,
@@ -18,10 +17,8 @@ import {
 
 export function TTSProviderSelector() {
   const provider = useConfigStore((s) => s.ttsProvider);
-  const apiKey = useConfigStore((s) => s.getElevenlabsApiKey());
   const voice = useConfigStore((s) => s.getElevenlabsVoice());
   const setProvider = useConfigStore((s) => s.setTtsProvider);
-  const setApiKey = useConfigStore((s) => s.setElevenlabsApiKey);
   const setVoice = useConfigStore((s) => s.setElevenlabsVoice);
 
   return (
@@ -49,19 +46,6 @@ export function TTSProviderSelector() {
 
       {provider === "elevenlabs" && (
         <FieldGroup>
-          <Field>
-            <FieldLabel>API Key</FieldLabel>
-            <FieldContent>
-              <PasswordInput
-                placeholder="API Key"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-              />
-              <FieldDescription>
-                Se guarda localmente en este dispositivo.
-              </FieldDescription>
-            </FieldContent>
-          </Field>
           <Field>
             <FieldLabel>Voz</FieldLabel>
             <FieldContent>

@@ -1,6 +1,9 @@
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
+import { sValidator } from "@hono/standard-validator";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
 import { proxy } from "hono/proxy";
+import * as z from "zod";
 import { sessionJwtMiddleware, startSession } from "./auth";
 import type { AppEnv } from "./config";
 
@@ -9,6 +12,41 @@ const app = new Hono<AppEnv>();
 app.post("/api/auth/start-session", startSession);
 
 app.use("/api/*", sessionJwtMiddleware);
+
+const ttsSchema = z.object({
+  text: z.string(),
+  voice: z.string(),
+  model: z.string(),
+});
+
+app.post("/api/tts", sValidator("json", ttsSchema), async (c) => {
+  const { text, voice, model } = c.req.valid("json");
+  const ELEVEN_LABS_API_KEY = c.env.ELEVEN_LABS_API_KEY;
+
+  if (!ELEVEN_LABS_API_KEY) {
+    return c.json({ error: "ElevenLabs API key not configured" }, 500);
+  }
+
+  const client = new ElevenLabsClient({ apiKey: ELEVEN_LABS_API_KEY });
+
+  try {
+    const speechStream = await client.textToSpeech.convert(voice, {
+      text,
+      modelId: model,
+      outputFormat: "mp3_44100_128",
+    });
+
+    return new Response(speechStream, {
+      headers: {
+        "Content-Type": "audio/mpeg",
+      },
+    });
+  } catch (error) {
+    console.error("ElevenLabs TTS error:", error);
+    return c.json({ error: "Failed to generate speech" }, 500);
+  }
+});
+
 app.use(
   "/api/tags",
   cache({
